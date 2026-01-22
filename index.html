@@ -559,23 +559,23 @@
                     <div class="satisfaction-row">
                         <span class="satisfaction-label">R&D</span>
                         <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="rdFill" style="width: 70%"></div>
+                            <div class="satisfaction-fill healthy" id="rdFill" style="width: 60%"></div>
                         </div>
-                        <span class="satisfaction-value" id="rdValue">70%</span>
+                        <span class="satisfaction-value" id="rdValue">60%</span>
                     </div>
                     <div class="satisfaction-row">
                         <span class="satisfaction-label">Sales</span>
                         <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="salesFill" style="width: 70%"></div>
+                            <div class="satisfaction-fill healthy" id="salesFill" style="width: 60%"></div>
                         </div>
-                        <span class="satisfaction-value" id="salesValue">70%</span>
+                        <span class="satisfaction-value" id="salesValue">60%</span>
                     </div>
                     <div class="satisfaction-row">
                         <span class="satisfaction-label">Benchmark</span>
                         <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="benchmarkFill" style="width: 70%"></div>
+                            <div class="satisfaction-fill healthy" id="benchmarkFill" style="width: 60%"></div>
                         </div>
-                        <span class="satisfaction-value" id="benchmarkValue">70%</span>
+                        <span class="satisfaction-value" id="benchmarkValue">60%</span>
                     </div>
                 </div>
 
@@ -632,9 +632,9 @@
             totalDays: 3650,
 
             satisfaction: {
-                rd: 70,
-                sales: 70,
-                benchmark: 70
+                rd: 60,
+                sales: 60,
+                benchmark: 60
             },
 
             // 15 racks: 3 rows x 5 columns
@@ -823,8 +823,8 @@
             team = team || 'rd';
 
             const template = randomChoice(requestTemplates[team]);
-            const deadline = randomInt(3, 10);
-            const isUrgent = deadline <= 3 && Math.random() < 0.3;
+            const deadline = randomInt(2, 7);
+            const isUrgent = deadline <= 3 && Math.random() < 0.4;
 
             return {
                 id: Date.now() + Math.random(),
@@ -842,8 +842,9 @@
 
         function shouldGenerateRequest() {
             // Base chance, modified by current queue size
-            const baseChance = 0.4;
-            const queueModifier = Math.max(0, 1 - gameState.requests.length * 0.15);
+            // Higher base = more frequent requests
+            const baseChance = 0.55;
+            const queueModifier = Math.max(0.2, 1 - gameState.requests.length * 0.12);
             return Math.random() < baseChance * queueModifier;
         }
 
@@ -1012,9 +1013,9 @@
             gameState.requests.forEach(request => {
                 request.daysWaiting++;
                 if (request.daysWaiting >= request.deadline) {
-                    // Missed deadline
+                    // Missed deadline - bigger penalties
                     gameState.jobsMissed[request.team]++;
-                    const penalty = request.isUrgent ? -15 : -10;
+                    const penalty = request.isUrgent ? -20 : -12;
                     adjustSatisfaction(request.team, penalty);
                     logEvent(`MISSED: ${request.name} deadline expired (${penalty} ${request.team.toUpperCase()})`);
                 }
@@ -1311,8 +1312,8 @@
         // INITIALIZATION
         // ============================================
         function init() {
-            // Generate initial requests
-            for (let i = 0; i < 2; i++) {
+            // Generate initial requests - start with pressure
+            for (let i = 0; i < 3; i++) {
                 gameState.requests.push(generateRequest());
             }
 
