@@ -1,1121 +1,1098 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rack & Ruin</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg-color: #1a1f2e;
-            --grid-color: #2a3a5a;
-            --grid-line: #3a4a6a;
-            --text-color: #c0d0e0;
-            --accent-blue: #4a9eff;
-            --accent-amber: #ffaa00;
-            --rack-empty: #2a3a4a;
-            --rack-rd: #4a7a4a;
-            --rack-sales: #7a4a7a;
-            --rack-benchmark: #4a4a7a;
-            --danger: #ff4a4a;
-            --success: #4aff4a;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
-
-        body {
-            font-family: 'Courier New', monospace;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            background-image:
-                linear-gradient(var(--grid-line) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
-            background-size: 20px 20px;
-            background-position: -1px -1px;
-        }
-
-        .container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            padding: 1vh 1vw;
-            max-width: 100%;
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1vh 1.5vw;
-            background: linear-gradient(180deg, #2a3a5a 0%, #1a2a4a 100%);
-            border: 2px solid var(--grid-line);
-            flex-shrink: 0;
-        }
-
-        .title {
-            font-size: clamp(14px, 2vw, 24px);
-            font-weight: bold;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .date-display {
-            font-size: clamp(12px, 1.5vw, 18px);
-            color: var(--accent-amber);
-        }
-
-        .day-counter {
-            font-size: clamp(10px, 1.2vw, 14px);
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        /* Main Grid Layout */
-        .game-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5vh;
-            flex: 1;
-            min-height: 0;
-            margin-top: 1vh;
-        }
-
-        /* Main Area */
-        .main-area {
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        /* Datacenter Floor */
-        .datacenter {
-            background: rgba(20, 30, 50, 0.8);
-            border: 2px solid var(--grid-line);
-            padding: 1.5vh 1.5vw;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-
-        .datacenter h2 {
-            color: var(--accent-blue);
-            margin-bottom: 1vh;
-            font-size: clamp(10px, 1.2vw, 14px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-
-        .rack-floor {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            grid-template-rows: auto 1fr auto 1fr auto 1fr;
-            gap: 0.8vh 0.8vw;
-            flex: 1;
-            min-height: 0;
-        }
-
-        .rack {
-            background: var(--rack-empty);
-            border: 2px solid var(--grid-line);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-            min-height: 0;
-        }
-
-        .rack:hover {
-            border-color: var(--accent-blue);
-            box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
-        }
-
-        .rack.selected {
-            border-color: var(--accent-amber);
-            box-shadow: 0 0 15px rgba(255, 170, 0, 0.5);
-        }
-
-        .rack.occupied-rd {
-            background: var(--rack-rd);
-        }
-
-        .rack.occupied-sales {
-            background: var(--rack-sales);
-        }
-
-        .rack.occupied-benchmark {
-            background: var(--rack-benchmark);
-        }
-
-        .rack.provisioning {
-            opacity: 0.6;
-            animation: pulse 1s infinite;
-        }
-
-        .rack.deprovisioning {
-            opacity: 0.4;
-            background: repeating-linear-gradient(
-                45deg,
-                var(--rack-empty),
-                var(--rack-empty) 5px,
-                #1a2a3a 5px,
-                #1a2a3a 10px
-            );
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 0.9; }
-        }
-
-        .rack-label {
-            font-size: clamp(8px, 1vw, 12px);
-            color: var(--text-color);
-            opacity: 0.7;
-        }
-
-        .rack-job {
-            font-size: clamp(7px, 0.8vw, 10px);
-            text-align: center;
-            padding: 2px 4px;
-            max-width: 90%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .rack-days {
-            font-size: clamp(8px, 0.9vw, 11px);
-            color: var(--accent-amber);
-            margin-top: 2px;
-        }
-
-        .row-label {
-            grid-column: 1 / -1;
-            font-size: clamp(9px, 1vw, 12px);
-            color: var(--text-color);
-            opacity: 0.5;
-            padding: 0.3vh 0;
-            border-bottom: 1px dashed var(--grid-line);
-            display: flex;
-            align-items: center;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1vh;
-            min-height: 0;
-            overflow: hidden;
-        }
-
-        /* Request Queue */
-        .request-queue {
-            background: rgba(20, 30, 50, 0.8);
-            border: 2px solid var(--grid-line);
-            padding: 1vh 1vw;
-            flex: 1;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
-        .request-queue h2 {
-            color: var(--accent-blue);
-            margin-bottom: 1vh;
-            font-size: clamp(10px, 1.2vw, 14px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .request-card {
-            background: rgba(40, 50, 70, 0.8);
-            border: 1px solid var(--grid-line);
-            padding: 0.8vh 0.6vw;
-            margin-bottom: 0.8vh;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .request-card:hover {
-            border-color: var(--accent-blue);
-        }
-
-        .request-card.selected {
-            border-color: var(--accent-amber);
-            background: rgba(60, 70, 90, 0.8);
-        }
-
-        .request-card.urgent {
-            border-left: 3px solid var(--danger);
-        }
-
-        .request-team {
-            font-size: clamp(9px, 1vw, 12px);
-            font-weight: bold;
-            margin-bottom: 0.3vh;
-        }
-
-        .request-team.rd { color: #6a9a6a; }
-        .request-team.sales { color: #9a6a9a; }
-        .request-team.benchmark { color: #6a6a9a; }
-
-        .request-name {
-            font-size: clamp(8px, 0.9vw, 11px);
-            margin-bottom: 0.3vh;
-        }
-
-        .request-details {
-            font-size: clamp(8px, 0.85vw, 10px);
-            opacity: 0.7;
-        }
-
-        .request-deadline {
-            color: var(--accent-amber);
-        }
-
-        .request-adjacency {
-            color: var(--accent-blue);
-            font-style: italic;
-        }
-
-        /* Satisfaction Panel */
-        .satisfaction-panel {
-            background: rgba(20, 30, 50, 0.8);
-            border: 2px solid var(--grid-line);
-            padding: 1vh 1vw;
-            flex-shrink: 0;
-        }
-
-        .satisfaction-panel h2 {
-            color: var(--accent-blue);
-            margin-bottom: 1vh;
-            font-size: clamp(10px, 1.2vw, 14px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .satisfaction-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 0.6vh;
-        }
-
-        .satisfaction-label {
-            width: 6vw;
-            min-width: 50px;
-            font-size: clamp(9px, 1vw, 12px);
-        }
-
-        .satisfaction-bar {
-            flex: 1;
-            height: clamp(10px, 1.5vh, 16px);
-            background: rgba(40, 50, 70, 0.8);
-            border: 1px solid var(--grid-line);
-            position: relative;
-            margin: 0 0.5vw;
-        }
-
-        .satisfaction-fill {
-            height: 100%;
-            transition: width 0.3s, background-color 0.3s;
-        }
-
-        .satisfaction-fill.healthy { background: var(--success); }
-        .satisfaction-fill.warning { background: var(--accent-amber); }
-        .satisfaction-fill.danger { background: var(--danger); }
-
-        .satisfaction-value {
-            width: 3vw;
-            min-width: 30px;
-            text-align: right;
-            font-size: clamp(9px, 1vw, 12px);
-        }
-
-        /* Controls */
-        .controls {
-            display: flex;
-            gap: 0.8vw;
-            margin-top: 1vh;
-            flex-shrink: 0;
-        }
-
-        .btn {
-            padding: 0.8vh 1.2vw;
-            font-family: 'Courier New', monospace;
-            font-size: clamp(9px, 1vw, 14px);
-            background: rgba(40, 50, 70, 0.8);
-            border: 2px solid var(--grid-line);
-            color: var(--text-color);
-            cursor: pointer;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-        }
-
-        .btn:hover {
-            border-color: var(--accent-blue);
-            background: rgba(60, 70, 90, 0.8);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn.primary {
-            border-color: var(--accent-amber);
-            color: var(--accent-amber);
-        }
-
-        .btn.primary:hover {
-            background: rgba(255, 170, 0, 0.2);
-        }
-
-        /* Event Log */
-        .event-log {
-            background: rgba(20, 30, 50, 0.8);
-            border: 2px solid var(--grid-line);
-            padding: 1vh 1vw;
-            margin-top: 1vh;
-            flex: 0 0 12vh;
-            overflow-y: auto;
-        }
-
-        .event-log h2 {
-            color: var(--accent-blue);
-            margin-bottom: 0.5vh;
-            font-size: clamp(10px, 1.2vw, 14px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .log-entry {
-            font-size: clamp(8px, 0.9vw, 11px);
-            padding: 0.2vh 0;
-            border-bottom: 1px dashed rgba(100, 120, 140, 0.3);
-        }
-
-        .log-day {
-            color: var(--accent-amber);
-        }
-
-        /* Sysadmin Capacity */
-        .capacity-panel {
-            background: rgba(20, 30, 50, 0.8);
-            border: 2px solid var(--grid-line);
-            padding: 1vh 1vw;
-            flex-shrink: 0;
-        }
-
-        .capacity-panel h2 {
-            color: var(--accent-blue);
-            margin-bottom: 0.5vh;
-            font-size: clamp(10px, 1.2vw, 14px);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .capacity-info {
-            font-size: clamp(9px, 1vw, 12px);
-        }
-
-        .capacity-used {
-            color: var(--accent-amber);
-        }
-
-        /* Game Over / Win Screen */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal {
-            background: var(--bg-color);
-            border: 3px solid var(--grid-line);
-            padding: 40px;
-            text-align: center;
-            max-width: 400px;
-        }
-
-        .modal h2 {
-            font-size: 28px;
-            margin-bottom: 20px;
-        }
-
-        .modal.game-over h2 {
-            color: var(--danger);
-        }
-
-        .modal.victory h2 {
-            color: var(--success);
-        }
-
-        .modal p {
-            margin-bottom: 20px;
-        }
-
-        /* Pushback Modal */
-        .pushback-modal {
-            max-width: 500px;
-        }
-
-        .pushback-modal h2 {
-            color: var(--accent-amber);
-        }
-
-        .pushback-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .pushback-response {
-            background: rgba(40, 50, 70, 0.8);
-            padding: 15px;
-            margin: 15px 0;
-            border-left: 3px solid var(--accent-blue);
-            text-align: left;
-        }
-
-        .pushback-cost {
-            color: var(--danger);
-            font-size: 12px;
-            margin-top: 5px;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <div class="title">Rack & Ruin</div>
-            <div class="header-right">
-                <div class="date-display" id="dateDisplay">January 1, 2015</div>
-                <div class="day-counter" id="dayCounter">Day 1 / 3650</div>
-            </div>
-        </header>
-
-        <div class="game-grid">
-            <div class="main-area">
-                <div class="datacenter">
-                    <h2>Datacenter Floor</h2>
-                    <div class="rack-floor" id="rackFloor">
-                        <!-- Racks will be generated by JS -->
-                    </div>
-                </div>
-
-                <div class="controls">
-                    <button class="btn" id="placeBtn" disabled>Place Job</button>
-                    <button class="btn primary" id="advanceBtn">Advance Day &rarr;</button>
-                    <button class="btn" id="fastForwardBtn">Fast Forward &rarr;&rarr;</button>
-                </div>
-
-                <div class="event-log">
-                    <h2>Event Log</h2>
-                    <div id="eventLog">
-                        <div class="log-entry"><span class="log-day">Day 1:</span> Welcome to 2015. Good luck.</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="sidebar">
-                <div class="request-queue">
-                    <h2>Requests</h2>
-                    <div id="requestQueue">
-                        <!-- Requests will be generated by JS -->
-                    </div>
-                </div>
-
-                <div class="satisfaction-panel">
-                    <h2>Team Satisfaction</h2>
-                    <div class="satisfaction-row">
-                        <span class="satisfaction-label">R&D</span>
-                        <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="rdFill" style="width: 60%"></div>
-                        </div>
-                        <span class="satisfaction-value" id="rdValue">60%</span>
-                    </div>
-                    <div class="satisfaction-row">
-                        <span class="satisfaction-label">Sales</span>
-                        <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="salesFill" style="width: 60%"></div>
-                        </div>
-                        <span class="satisfaction-value" id="salesValue">60%</span>
-                    </div>
-                    <div class="satisfaction-row">
-                        <span class="satisfaction-label">Benchmark</span>
-                        <div class="satisfaction-bar">
-                            <div class="satisfaction-fill healthy" id="benchmarkFill" style="width: 60%"></div>
-                        </div>
-                        <span class="satisfaction-value" id="benchmarkValue">60%</span>
-                    </div>
-                </div>
-
-                <div class="capacity-panel">
-                    <h2>Sysadmin Team</h2>
-                    <div class="capacity-info">
-                        <div>Team: 2 people</div>
-                        <div>Used today: <span class="capacity-used" id="capacityUsed">0</span> / 8 racks</div>
-                        <div>Depro queue: <span id="deproQueue">0</span> racks</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Game Over Modal -->
-    <div class="modal-overlay" id="gameOverModal">
-        <div class="modal game-over">
-            <h2>GAME OVER</h2>
-            <p id="gameOverReason">A team's satisfaction dropped below 20%.</p>
-            <p id="gameOverStats"></p>
-            <button class="btn primary" onclick="location.reload()">Try Again</button>
-        </div>
-    </div>
-
-    <!-- Victory Modal -->
-    <div class="modal-overlay" id="victoryModal">
-        <div class="modal victory">
-            <h2>VICTORY!</h2>
-            <p>You survived a decade of datacenter management!</p>
-            <p id="victoryStats"></p>
-            <button class="btn primary" onclick="location.reload()">Play Again</button>
-        </div>
-    </div>
-
-    <!-- Pushback Modal -->
-    <div class="modal-overlay" id="pushbackModal">
-        <div class="modal pushback-modal">
-            <h2 id="pushbackTitle">Request Options</h2>
-            <div id="pushbackContent"></div>
-            <div class="pushback-options" id="pushbackOptions"></div>
-        </div>
-    </div>
-
-    <script>
-        // ============================================
-        // GAME STATE
-        // ============================================
-        const gameState = {
-            day: 1,
-            year: 2015,
-            month: 1,
-            dayOfMonth: 1,
-            totalDays: 3650,
-
-            satisfaction: {
-                rd: 60,
-                sales: 60,
-                benchmark: 60
-            },
-
-            // 15 racks: 3 rows x 5 columns
-            racks: Array(15).fill(null),
-
-            // Request queue
-            requests: [],
-
-            // Currently selected request
-            selectedRequest: null,
-
-            // Selected racks for placement
-            selectedRacks: [],
-
-            // Sysadmin capacity used today (provisioning + deprovisioning)
-            capacityUsedToday: 0,
-            maxCapacity: 8,
-
-            // Racks pending deprovisioning (array of {rackIndex, team, name})
-            deproQueue: [],
-
-            // Stats
-            jobsCompleted: { rd: 0, sales: 0, benchmark: 0 },
-            jobsMissed: { rd: 0, sales: 0, benchmark: 0 },
-
-            // Game state
-            gameOver: false,
-            victory: false
-        };
-
-        // ============================================
-        // REQUEST TEMPLATES
-        // ============================================
-        // Adjacency rules:
-        // - Benchmark: ALWAYS requires same row (results invalid otherwise)
-        // - R&D: SOMETIMES requires same row (MPI/interconnect tests yes, software validation no)
-        // - Sales: NEVER requires adjacency (demos don't need nanosecond latency)
-        const requestTemplates = {
-            rd: [
-                // Adjacency required - hardware/interconnect testing
-                { name: "DDR4 validation cluster", racks: 4, duration: 14, adjacency: true },
-                { name: "100GbE integration test", racks: 3, duration: 12, adjacency: true },
-                { name: "EPYC Naples validation", racks: 5, duration: 21, adjacency: true },
-                { name: "InfiniBand fabric test", racks: 4, duration: 10, adjacency: true },
-                // No adjacency required - software/single-node testing
-                { name: "Broadwell-EP firmware update", racks: 3, duration: 21, adjacency: false },
-                { name: "NVMe driver validation", racks: 2, duration: 10, adjacency: false },
-                { name: "Skylake BIOS testing", racks: 4, duration: 18, adjacency: false },
-                { name: "PCIe 4.0 compatibility", racks: 2, duration: 7, adjacency: false },
-                { name: "Optane memory testing", racks: 3, duration: 14, adjacency: false }
-            ],
-            sales: [
-                // Sales demos never require adjacency
-                { name: "ORNL demo", racks: 2, duration: 5, adjacency: false },
-                { name: "Stanford AI showcase", racks: 3, duration: 7, adjacency: false },
-                { name: "NASA simulation demo", racks: 2, duration: 5, adjacency: false },
-                { name: "Nexus Automotive POC", racks: 2, duration: 7, adjacency: false },
-                { name: "Stratos Aerospace CFD demo", racks: 3, duration: 5, adjacency: false },
-                { name: "MIT research preview", racks: 2, duration: 7, adjacency: false },
-                { name: "LANL competitive eval", racks: 3, duration: 10, adjacency: false },
-                { name: "Helix Genomics pipeline", racks: 2, duration: 5, adjacency: false },
-                { name: "UW-Madison Space Science", racks: 2, duration: 7, adjacency: false },
-                { name: "Argonne materials demo", racks: 3, duration: 5, adjacency: false }
-            ],
-            benchmark: [
-                // Benchmarks ALWAYS require adjacency - results invalid otherwise
-                { name: "Intel vs AMD comparison", racks: 6, duration: 14, adjacency: true },
-                { name: "GPU compute scaling", racks: 4, duration: 10, adjacency: true },
-                { name: "Storage throughput test", racks: 5, duration: 12, adjacency: true },
-                { name: "Network latency analysis", racks: 4, duration: 7, adjacency: true },
-                { name: "Memory bandwidth study", racks: 4, duration: 10, adjacency: true },
-                { name: "Power efficiency audit", racks: 6, duration: 14, adjacency: true },
-                { name: "MPI scaling benchmark", racks: 5, duration: 10, adjacency: true },
-                { name: "LINPACK validation", racks: 6, duration: 7, adjacency: true }
-            ]
-        };
-
-        // ============================================
-        // UTILITY FUNCTIONS
-        // ============================================
-        function formatDate(day) {
-            const startDate = new Date(2015, 0, 1);
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + day - 1);
-
-            const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-
-            return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
-        }
-
-        function getYear(day) {
-            const startDate = new Date(2015, 0, 1);
-            const currentDate = new Date(startDate);
-            currentDate.setDate(startDate.getDate() + day - 1);
-            return currentDate.getFullYear();
-        }
-
-        function randomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-        function randomChoice(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
-        }
-
-        // ============================================
-        // RACK FUNCTIONS
-        // ============================================
-        function getRackRow(index) {
-            return Math.floor(index / 5);
-        }
-
-        function getRackCol(index) {
-            return index % 5;
-        }
-
-        function areRacksAdjacent(indices) {
-            if (indices.length <= 1) return true;
-
-            const rows = indices.map(i => getRackRow(i));
-            const cols = indices.map(i => getRackCol(i));
-
-            // All must be in same row
-            if (new Set(rows).size !== 1) return false;
-
-            // Columns must be contiguous
-            cols.sort((a, b) => a - b);
-            for (let i = 1; i < cols.length; i++) {
-                if (cols[i] - cols[i-1] !== 1) return false;
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Rack & Ruin</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
             }
 
-            return true;
-        }
+            :root {
+                --bg-color: #1a1f2e;
+                --grid-color: #2a3a5a;
+                --grid-line: #3a4a6a;
+                --text-color: #c0d0e0;
+                --accent-blue: #4a9eff;
+                --accent-amber: #ffaa00;
+                --rack-empty: #2a3a4a;
+                --rack-rd: #4a7a4a;
+                --rack-sales: #7a4a7a;
+                --rack-benchmark: #4a4a7a;
+                --danger: #ff4a4a;
+                --success: #4aff4a;
+            }
 
-        function findAvailableRacks(count, requireAdjacency) {
-            const available = [];
+            html,
+            body {
+                height: 100%;
+                overflow: hidden;
+            }
 
-            for (let i = 0; i < 15; i++) {
-                if (gameState.racks[i] === null) {
-                    available.push(i);
+            body {
+                font-family: 'Courier New', monospace;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                background-image:
+                    linear-gradient(var(--grid-line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+                background-size: 20px 20px;
+                background-position: -1px -1px;
+            }
+
+            .container {
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                padding: 1vh 1vw;
+                max-width: 100%;
+            }
+
+            /* Header */
+            header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1vh 1.5vw;
+                background: linear-gradient(180deg, #2a3a5a 0%, #1a2a4a 100%);
+                border: 2px solid var(--grid-line);
+                flex-shrink: 0;
+            }
+
+            .title {
+                font-size: clamp(14px, 2vw, 24px);
+                font-weight: bold;
+                color: var(--accent-blue);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+            }
+
+            .date-display {
+                font-size: clamp(12px, 1.5vw, 18px);
+                color: var(--accent-amber);
+            }
+
+            .day-counter {
+                font-size: clamp(10px, 1.2vw, 14px);
+                color: var(--text-color);
+                opacity: 0.7;
+            }
+
+            /* Main Grid Layout */
+            .game-grid {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 1.5vh;
+                flex: 1;
+                min-height: 0;
+                margin-top: 1vh;
+            }
+
+            /* Main Area */
+            .main-area {
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            /* Datacenter Floor */
+            .datacenter {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1.5vh 1.5vw;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                min-height: 0;
+            }
+
+            .datacenter h2 {
+                color: var(--accent-blue);
+                margin-bottom: 1vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                flex-shrink: 0;
+            }
+
+            .rack-floor {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                grid-template-rows: auto 1fr auto 1fr auto 1fr;
+                gap: 0.8vh 0.8vw;
+                flex: 1;
+                min-height: 0;
+            }
+
+            .rack {
+                background: var(--rack-empty);
+                border: 2px solid var(--grid-line);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                position: relative;
+                min-height: 0;
+            }
+
+            .rack:hover {
+                border-color: var(--accent-blue);
+                box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+            }
+
+            .rack.selected {
+                border-color: var(--accent-amber);
+                box-shadow: 0 0 15px rgba(255, 170, 0, 0.5);
+            }
+
+            .rack.occupied-rd {
+                background: var(--rack-rd);
+            }
+
+            .rack.occupied-sales {
+                background: var(--rack-sales);
+            }
+
+            .rack.occupied-benchmark {
+                background: var(--rack-benchmark);
+            }
+
+            .rack.provisioning {
+                opacity: 0.6;
+                animation: pulse 1s infinite;
+            }
+
+            .rack.deprovisioning {
+                opacity: 0.4;
+                background: repeating-linear-gradient(
+                    45deg,
+                    var(--rack-empty),
+                    var(--rack-empty) 5px,
+                    #1a2a3a 5px,
+                    #1a2a3a 10px
+                );
+            }
+
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 0.6;
+                }
+                50% {
+                    opacity: 0.9;
                 }
             }
 
-            if (available.length < count) return null;
-
-            if (!requireAdjacency) {
-                return available.slice(0, count);
+            .rack-label {
+                font-size: clamp(8px, 1vw, 12px);
+                color: var(--text-color);
+                opacity: 0.7;
             }
 
-            // Find contiguous racks in same row
-            for (let row = 0; row < 3; row++) {
-                let consecutive = [];
-                for (let col = 0; col < 5; col++) {
-                    const idx = row * 5 + col;
-                    if (gameState.racks[idx] === null) {
-                        consecutive.push(idx);
-                        if (consecutive.length >= count) {
-                            return consecutive.slice(0, count);
-                        }
-                    } else {
-                        consecutive = [];
+            .rack-job {
+                font-size: clamp(7px, 0.8vw, 10px);
+                text-align: center;
+                padding: 2px 4px;
+                max-width: 90%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .rack-days {
+                font-size: clamp(8px, 0.9vw, 11px);
+                color: var(--accent-amber);
+                margin-top: 2px;
+            }
+
+            .row-label {
+                grid-column: 1 / -1;
+                font-size: clamp(9px, 1vw, 12px);
+                color: var(--text-color);
+                opacity: 0.5;
+                padding: 0.3vh 0;
+                border-bottom: 1px dashed var(--grid-line);
+                display: flex;
+                align-items: center;
+            }
+
+            /* Sidebar */
+            .sidebar {
+                display: flex;
+                flex-direction: column;
+                gap: 1vh;
+                min-height: 0;
+                overflow: hidden;
+            }
+
+            /* Request Queue */
+            .request-queue {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex: 1;
+                overflow-y: auto;
+                min-height: 0;
+            }
+
+            .request-queue h2 {
+                color: var(--accent-blue);
+                margin-bottom: 1vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .request-card {
+                background: rgba(40, 50, 70, 0.8);
+                border: 1px solid var(--grid-line);
+                padding: 0.8vh 0.6vw;
+                margin-bottom: 0.8vh;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .request-card:hover {
+                border-color: var(--accent-blue);
+            }
+
+            .request-card.selected {
+                border-color: var(--accent-amber);
+                background: rgba(60, 70, 90, 0.8);
+            }
+
+            .request-card.urgent {
+                border-left: 3px solid var(--danger);
+            }
+
+            .request-team {
+                font-size: clamp(9px, 1vw, 12px);
+                font-weight: bold;
+                margin-bottom: 0.3vh;
+            }
+
+            .request-team.rd {
+                color: #6a9a6a;
+            }
+            .request-team.sales {
+                color: #9a6a9a;
+            }
+            .request-team.benchmark {
+                color: #6a6a9a;
+            }
+
+            .request-name {
+                font-size: clamp(8px, 0.9vw, 11px);
+                margin-bottom: 0.3vh;
+            }
+
+            .request-details {
+                font-size: clamp(8px, 0.85vw, 10px);
+                opacity: 0.7;
+            }
+
+            .request-deadline {
+                color: var(--accent-amber);
+            }
+
+            .request-adjacency {
+                color: var(--accent-blue);
+                font-style: italic;
+            }
+
+            /* Satisfaction Panel */
+            .satisfaction-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+            }
+
+            .satisfaction-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 1vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .satisfaction-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 0.6vh;
+            }
+
+            .satisfaction-label {
+                width: 6vw;
+                min-width: 50px;
+                font-size: clamp(9px, 1vw, 12px);
+            }
+
+            .satisfaction-bar {
+                flex: 1;
+                height: clamp(10px, 1.5vh, 16px);
+                background: rgba(40, 50, 70, 0.8);
+                border: 1px solid var(--grid-line);
+                position: relative;
+                margin: 0 0.5vw;
+            }
+
+            .satisfaction-fill {
+                height: 100%;
+                transition:
+                    width 0.3s,
+                    background-color 0.3s;
+            }
+
+            .satisfaction-fill.healthy {
+                background: var(--success);
+            }
+            .satisfaction-fill.warning {
+                background: var(--accent-amber);
+            }
+            .satisfaction-fill.danger {
+                background: var(--danger);
+            }
+
+            .satisfaction-value {
+                width: 3vw;
+                min-width: 30px;
+                text-align: right;
+                font-size: clamp(9px, 1vw, 12px);
+            }
+
+            /* Controls */
+            .controls {
+                display: flex;
+                gap: 0.8vw;
+                margin-top: 1vh;
+                flex-shrink: 0;
+            }
+
+            .btn {
+                padding: 0.8vh 1.2vw;
+                font-family: 'Courier New', monospace;
+                font-size: clamp(9px, 1vw, 14px);
+                background: rgba(40, 50, 70, 0.8);
+                border: 2px solid var(--grid-line);
+                color: var(--text-color);
+                cursor: pointer;
+                transition: all 0.2s;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                white-space: nowrap;
+            }
+
+            .btn:hover {
+                border-color: var(--accent-blue);
+                background: rgba(60, 70, 90, 0.8);
+            }
+
+            .btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .btn.primary {
+                border-color: var(--accent-amber);
+                color: var(--accent-amber);
+            }
+
+            .btn.primary:hover {
+                background: rgba(255, 170, 0, 0.2);
+            }
+
+            /* Event Log */
+            .event-log {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                margin-top: 1vh;
+                flex: 0 0 12vh;
+                overflow-y: auto;
+            }
+
+            .event-log h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .log-entry {
+                font-size: clamp(8px, 0.9vw, 11px);
+                padding: 0.2vh 0;
+                border-bottom: 1px dashed rgba(100, 120, 140, 0.3);
+            }
+
+            .log-day {
+                color: var(--accent-amber);
+            }
+
+            /* Sysadmin Capacity */
+            .capacity-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+            }
+
+            .capacity-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .capacity-info {
+                font-size: clamp(9px, 1vw, 12px);
+            }
+
+            .capacity-used {
+                color: var(--accent-amber);
+            }
+
+            /* Game Over / Win Screen */
+            .modal-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            }
+
+            .modal-overlay.active {
+                display: flex;
+            }
+
+            .modal {
+                background: var(--bg-color);
+                border: 3px solid var(--grid-line);
+                padding: 40px;
+                text-align: center;
+                max-width: 400px;
+            }
+
+            .modal h2 {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .modal.game-over h2 {
+                color: var(--danger);
+            }
+
+            .modal.victory h2 {
+                color: var(--success);
+            }
+
+            .modal p {
+                margin-bottom: 20px;
+            }
+
+            /* Pushback Modal */
+            .pushback-modal {
+                max-width: 500px;
+            }
+
+            .pushback-modal h2 {
+                color: var(--accent-amber);
+            }
+
+            .pushback-options {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .pushback-response {
+                background: rgba(40, 50, 70, 0.8);
+                padding: 15px;
+                margin: 15px 0;
+                border-left: 3px solid var(--accent-blue);
+                text-align: left;
+            }
+
+            .pushback-cost {
+                color: var(--danger);
+                font-size: 12px;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <div class="title">Rack & Ruin</div>
+                <div class="header-right">
+                    <div class="date-display" id="dateDisplay">January 1, 2015</div>
+                    <div class="day-counter" id="dayCounter">Day 1 / 3650</div>
+                </div>
+            </header>
+
+            <div class="game-grid">
+                <div class="main-area">
+                    <div class="datacenter">
+                        <h2>Datacenter Floor</h2>
+                        <div class="rack-floor" id="rackFloor">
+                            <!-- Racks will be generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn" id="placeBtn" disabled>Place Job</button>
+                        <button class="btn primary" id="advanceBtn">Advance Day &rarr;</button>
+                        <button class="btn" id="fastForwardBtn">Fast Forward &rarr;&rarr;</button>
+                    </div>
+
+                    <div class="event-log">
+                        <h2>Event Log</h2>
+                        <div id="eventLog">
+                            <div class="log-entry"><span class="log-day">Day 1:</span> Welcome to 2015. Good luck.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar">
+                    <div class="request-queue">
+                        <h2>Requests</h2>
+                        <div id="requestQueue">
+                            <!-- Requests will be generated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="satisfaction-panel">
+                        <h2>Team Satisfaction</h2>
+                        <div class="satisfaction-row">
+                            <span class="satisfaction-label">R&D</span>
+                            <div class="satisfaction-bar">
+                                <div class="satisfaction-fill healthy" id="rdFill" style="width: 60%"></div>
+                            </div>
+                            <span class="satisfaction-value" id="rdValue">60%</span>
+                        </div>
+                        <div class="satisfaction-row">
+                            <span class="satisfaction-label">Sales</span>
+                            <div class="satisfaction-bar">
+                                <div class="satisfaction-fill healthy" id="salesFill" style="width: 60%"></div>
+                            </div>
+                            <span class="satisfaction-value" id="salesValue">60%</span>
+                        </div>
+                        <div class="satisfaction-row">
+                            <span class="satisfaction-label">Benchmark</span>
+                            <div class="satisfaction-bar">
+                                <div class="satisfaction-fill healthy" id="benchmarkFill" style="width: 60%"></div>
+                            </div>
+                            <span class="satisfaction-value" id="benchmarkValue">60%</span>
+                        </div>
+                    </div>
+
+                    <div class="capacity-panel">
+                        <h2>Sysadmin Team</h2>
+                        <div class="capacity-info">
+                            <div>Team: 2 people</div>
+                            <div>Used today: <span class="capacity-used" id="capacityUsed">0</span> / 8 racks</div>
+                            <div>Depro queue: <span id="deproQueue">0</span> racks</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Modal -->
+        <div class="modal-overlay" id="gameOverModal">
+            <div class="modal game-over">
+                <h2>GAME OVER</h2>
+                <p id="gameOverReason">A team's satisfaction dropped below 20%.</p>
+                <p id="gameOverStats"></p>
+                <button class="btn primary" onclick="location.reload()">Try Again</button>
+            </div>
+        </div>
+
+        <!-- Victory Modal -->
+        <div class="modal-overlay" id="victoryModal">
+            <div class="modal victory">
+                <h2>VICTORY!</h2>
+                <p>You survived a decade of datacenter management!</p>
+                <p id="victoryStats"></p>
+                <button class="btn primary" onclick="location.reload()">Play Again</button>
+            </div>
+        </div>
+
+        <!-- Pushback Modal -->
+        <div class="modal-overlay" id="pushbackModal">
+            <div class="modal pushback-modal">
+                <h2 id="pushbackTitle">Request Options</h2>
+                <div id="pushbackContent"></div>
+                <div class="pushback-options" id="pushbackOptions"></div>
+            </div>
+        </div>
+
+        <script>
+            // ============================================
+            // GAME STATE
+            // ============================================
+            const gameState = {
+                day: 1,
+                year: 2015,
+                month: 1,
+                dayOfMonth: 1,
+                totalDays: 3650,
+
+                satisfaction: {
+                    rd: 60,
+                    sales: 60,
+                    benchmark: 60,
+                },
+
+                // 15 racks: 3 rows x 5 columns
+                racks: Array(15).fill(null),
+
+                // Request queue
+                requests: [],
+
+                // Currently selected request
+                selectedRequest: null,
+
+                // Selected racks for placement
+                selectedRacks: [],
+
+                // Sysadmin capacity used today (provisioning + deprovisioning)
+                capacityUsedToday: 0,
+                maxCapacity: 8,
+
+                // Racks pending deprovisioning (array of {rackIndex, team, name})
+                deproQueue: [],
+
+                // Stats
+                jobsCompleted: { rd: 0, sales: 0, benchmark: 0 },
+                jobsMissed: { rd: 0, sales: 0, benchmark: 0 },
+
+                // Game state
+                gameOver: false,
+                victory: false,
+            };
+
+            // ============================================
+            // REQUEST TEMPLATES
+            // ============================================
+            // Adjacency rules:
+            // - Benchmark: ALWAYS requires same row (results invalid otherwise)
+            // - R&D: SOMETIMES requires same row (MPI/interconnect tests yes, software validation no)
+            // - Sales: NEVER requires adjacency (demos don't need nanosecond latency)
+            const requestTemplates = {
+                rd: [
+                    // Adjacency required - hardware/interconnect testing
+                    { name: 'DDR4 validation cluster', racks: 4, duration: 14, adjacency: true },
+                    { name: '100GbE integration test', racks: 3, duration: 12, adjacency: true },
+                    { name: 'EPYC Naples validation', racks: 5, duration: 21, adjacency: true },
+                    { name: 'InfiniBand fabric test', racks: 4, duration: 10, adjacency: true },
+                    // No adjacency required - software/single-node testing
+                    { name: 'Broadwell-EP firmware update', racks: 3, duration: 21, adjacency: false },
+                    { name: 'NVMe driver validation', racks: 2, duration: 10, adjacency: false },
+                    { name: 'Skylake BIOS testing', racks: 4, duration: 18, adjacency: false },
+                    { name: 'PCIe 4.0 compatibility', racks: 2, duration: 7, adjacency: false },
+                    { name: 'Optane memory testing', racks: 3, duration: 14, adjacency: false },
+                ],
+                sales: [
+                    // Sales demos never require adjacency
+                    { name: 'ORNL demo', racks: 2, duration: 5, adjacency: false },
+                    { name: 'Stanford AI showcase', racks: 3, duration: 7, adjacency: false },
+                    { name: 'NASA simulation demo', racks: 2, duration: 5, adjacency: false },
+                    { name: 'Nexus Automotive POC', racks: 2, duration: 7, adjacency: false },
+                    { name: 'Stratos Aerospace CFD demo', racks: 3, duration: 5, adjacency: false },
+                    { name: 'MIT research preview', racks: 2, duration: 7, adjacency: false },
+                    { name: 'LANL competitive eval', racks: 3, duration: 10, adjacency: false },
+                    { name: 'Helix Genomics pipeline', racks: 2, duration: 5, adjacency: false },
+                    { name: 'UW-Madison Space Science', racks: 2, duration: 7, adjacency: false },
+                    { name: 'Argonne materials demo', racks: 3, duration: 5, adjacency: false },
+                ],
+                benchmark: [
+                    // Benchmarks ALWAYS require adjacency - results invalid otherwise
+                    { name: 'Intel vs AMD comparison', racks: 6, duration: 14, adjacency: true },
+                    { name: 'GPU compute scaling', racks: 4, duration: 10, adjacency: true },
+                    { name: 'Storage throughput test', racks: 5, duration: 12, adjacency: true },
+                    { name: 'Network latency analysis', racks: 4, duration: 7, adjacency: true },
+                    { name: 'Memory bandwidth study', racks: 4, duration: 10, adjacency: true },
+                    { name: 'Power efficiency audit', racks: 6, duration: 14, adjacency: true },
+                    { name: 'MPI scaling benchmark', racks: 5, duration: 10, adjacency: true },
+                    { name: 'LINPACK validation', racks: 6, duration: 7, adjacency: true },
+                ],
+            };
+
+            // ============================================
+            // UTILITY FUNCTIONS
+            // ============================================
+            function formatDate(day) {
+                const startDate = new Date(2015, 0, 1);
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + day - 1);
+
+                const months = [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December',
+                ];
+
+                return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
+            }
+
+            function randomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            function randomChoice(arr) {
+                return arr[Math.floor(Math.random() * arr.length)];
+            }
+
+            // ============================================
+            // RACK FUNCTIONS
+            // ============================================
+            function getRackRow(index) {
+                return Math.floor(index / 5);
+            }
+
+            // ============================================
+            // REQUEST FUNCTIONS
+            // ============================================
+            function generateRequest() {
+                const teams = ['rd', 'sales', 'benchmark'];
+                const weights = [0.4, 0.35, 0.25];
+
+                let r = Math.random();
+                let team;
+                for (let i = 0; i < teams.length; i++) {
+                    r -= weights[i];
+                    if (r <= 0) {
+                        team = teams[i];
+                        break;
                     }
                 }
+                team = team || 'rd';
+
+                const template = randomChoice(requestTemplates[team]);
+                const deadline = randomInt(2, 7);
+                const isUrgent = deadline <= 3 && Math.random() < 0.4;
+
+                return {
+                    id: Date.now() + Math.random(),
+                    team: team,
+                    name: template.name,
+                    racks: template.racks,
+                    duration: template.duration,
+                    adjacency: template.adjacency,
+                    deadline: deadline,
+                    daysWaiting: 0,
+                    isUrgent: isUrgent,
+                    provisioning: 0, // Days left in provisioning
+                };
             }
 
-            return null;
-        }
-
-        // ============================================
-        // REQUEST FUNCTIONS
-        // ============================================
-        function generateRequest() {
-            const teams = ['rd', 'sales', 'benchmark'];
-            const weights = [0.4, 0.35, 0.25];
-
-            let r = Math.random();
-            let team;
-            for (let i = 0; i < teams.length; i++) {
-                r -= weights[i];
-                if (r <= 0) {
-                    team = teams[i];
-                    break;
-                }
-            }
-            team = team || 'rd';
-
-            const template = randomChoice(requestTemplates[team]);
-            const deadline = randomInt(2, 7);
-            const isUrgent = deadline <= 3 && Math.random() < 0.4;
-
-            return {
-                id: Date.now() + Math.random(),
-                team: team,
-                name: template.name,
-                racks: template.racks,
-                duration: template.duration,
-                adjacency: template.adjacency,
-                deadline: deadline,
-                daysWaiting: 0,
-                isUrgent: isUrgent,
-                provisioning: 0 // Days left in provisioning
-            };
-        }
-
-        function shouldGenerateRequest() {
-            // Base chance, modified by current queue size
-            // Higher base = more frequent requests
-            const baseChance = 0.55;
-            const queueModifier = Math.max(0.2, 1 - gameState.requests.length * 0.12);
-            return Math.random() < baseChance * queueModifier;
-        }
-
-        // ============================================
-        // SATISFACTION FUNCTIONS
-        // ============================================
-        function adjustSatisfaction(team, amount) {
-            gameState.satisfaction[team] = Math.max(0, Math.min(100, gameState.satisfaction[team] + amount));
-            updateSatisfactionDisplay();
-            checkGameOver();
-        }
-
-        function getSatisfactionClass(value) {
-            if (value >= 50) return 'healthy';
-            if (value >= 30) return 'warning';
-            return 'danger';
-        }
-
-        // ============================================
-        // GAME LOGIC
-        // ============================================
-        function areRacksSameRow(indices) {
-            if (indices.length <= 1) return true;
-            const rows = indices.map(i => getRackRow(i));
-            return new Set(rows).size === 1;
-        }
-
-        function canPlaceJob(request, rackIndices) {
-            // Jobs larger than a row (>5) must span rows - always allowed
-            if (request.racks > 5) return { allowed: true, penalty: 0 };
-
-            // Jobs that fit in one row
-            const sameRow = areRacksSameRow(rackIndices);
-
-            if (sameRow) {
-                return { allowed: true, penalty: 0 };
+            function shouldGenerateRequest() {
+                // Base chance, modified by current queue size
+                // Higher base = more frequent requests
+                const baseChance = 0.55;
+                const queueModifier = Math.max(0.2, 1 - gameState.requests.length * 0.12);
+                return Math.random() < baseChance * queueModifier;
             }
 
-            // Cross-row placement for jobs that could fit in one row
-            switch (request.team) {
-                case 'rd':
-                    // R&D tolerates it but not happy
-                    return { allowed: true, penalty: -8, reason: 'Cross-switch placement suboptimal' };
-                case 'sales':
-                    // Sales won't accept it
-                    return { allowed: false, reason: 'Sales requires same-row placement for demos' };
-                case 'benchmark':
-                    // Benchmark results would be invalid
-                    return { allowed: false, reason: 'Benchmark requires same-row for valid results' };
-                default:
+            // ============================================
+            // SATISFACTION FUNCTIONS
+            // ============================================
+            function adjustSatisfaction(team, amount) {
+                gameState.satisfaction[team] = Math.max(0, Math.min(100, gameState.satisfaction[team] + amount));
+                updateSatisfactionDisplay();
+                checkGameOver();
+            }
+
+            function getSatisfactionClass(value) {
+                if (value >= 50) return 'healthy';
+                if (value >= 30) return 'warning';
+                return 'danger';
+            }
+
+            // ============================================
+            // GAME LOGIC
+            // ============================================
+            function areRacksSameRow(indices) {
+                if (indices.length <= 1) return true;
+                const rows = indices.map((i) => getRackRow(i));
+                return new Set(rows).size === 1;
+            }
+
+            function canPlaceJob(request, rackIndices) {
+                // Jobs larger than a row (>5) must span rows - always allowed
+                if (request.racks > 5) return { allowed: true, penalty: 0 };
+
+                // Jobs that fit in one row
+                const sameRow = areRacksSameRow(rackIndices);
+
+                if (sameRow) {
                     return { allowed: true, penalty: 0 };
-            }
-        }
+                }
 
-        function placeJob(request, rackIndices) {
-            const placement = canPlaceJob(request, rackIndices);
-
-            if (!placement.allowed) {
-                logEvent(`Cannot place: ${placement.reason}`);
-                return false;
-            }
-
-            const job = {
-                id: request.id,
-                team: request.team,
-                name: request.name,
-                daysRemaining: request.duration,
-                provisioning: 1, // 1 day provisioning
-                rackIndices: rackIndices
-            };
-
-            rackIndices.forEach(idx => {
-                gameState.racks[idx] = job;
-            });
-
-            gameState.capacityUsedToday += rackIndices.length;
-
-            // Remove from queue
-            gameState.requests = gameState.requests.filter(r => r.id !== request.id);
-
-            // Apply any penalty for suboptimal placement
-            if (placement.penalty) {
-                logEvent(`${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`);
-                adjustSatisfaction(request.team, placement.penalty);
-            } else {
-                logEvent(`${request.name} placed successfully`);
-            }
-
-            gameState.selectedRequest = null;
-            gameState.selectedRacks = [];
-
-            updateDisplay();
-            return true;
-        }
-
-        function advanceDay() {
-            if (gameState.gameOver || gameState.victory) return;
-
-            gameState.day++;
-            gameState.capacityUsedToday = 0;
-
-            // Process deprovisioning first (uses sysadmin capacity)
-            const deproToProcess = [];
-            const capacityForDepro = Math.min(gameState.deproQueue.length, gameState.maxCapacity);
-
-            for (let i = 0; i < capacityForDepro; i++) {
-                const depro = gameState.deproQueue.shift();
-                if (depro) {
-                    deproToProcess.push(depro);
-                    gameState.capacityUsedToday++;
+                // Cross-row placement for jobs that could fit in one row
+                switch (request.team) {
+                    case 'rd':
+                        // R&D tolerates it but not happy
+                        return { allowed: true, penalty: -8, reason: 'Cross-switch placement suboptimal' };
+                    case 'sales':
+                        // Sales won't accept it
+                        return { allowed: false, reason: 'Sales requires same-row placement for demos' };
+                    case 'benchmark':
+                        // Benchmark results would be invalid
+                        return { allowed: false, reason: 'Benchmark requires same-row for valid results' };
+                    default:
+                        return { allowed: true, penalty: 0 };
                 }
             }
 
-            // Clear deprovisioned racks
-            deproToProcess.forEach(depro => {
-                gameState.racks[depro.rackIndex] = null;
-            });
+            function placeJob(request, rackIndices) {
+                const placement = canPlaceJob(request, rackIndices);
 
-            if (deproToProcess.length > 0) {
-                const rackCount = deproToProcess.length;
-                logEvent(`Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`);
+                if (!placement.allowed) {
+                    logEvent(`Cannot place: ${placement.reason}`);
+                    return false;
+                }
+
+                const job = {
+                    id: request.id,
+                    team: request.team,
+                    name: request.name,
+                    daysRemaining: request.duration,
+                    provisioning: 1, // 1 day provisioning
+                    rackIndices: rackIndices,
+                };
+
+                rackIndices.forEach((idx) => {
+                    gameState.racks[idx] = job;
+                });
+
+                gameState.capacityUsedToday += rackIndices.length;
+
+                // Remove from queue
+                gameState.requests = gameState.requests.filter((r) => r.id !== request.id);
+
+                // Apply any penalty for suboptimal placement
+                if (placement.penalty) {
+                    logEvent(
+                        `${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`,
+                    );
+                    adjustSatisfaction(request.team, placement.penalty);
+                } else {
+                    logEvent(`${request.name} placed successfully`);
+                }
+
+                gameState.selectedRequest = null;
+                gameState.selectedRacks = [];
+
+                updateDisplay();
+                return true;
             }
 
-            // Process jobs
-            const completedJobs = [];
-            gameState.racks.forEach((job, idx) => {
-                if (job && job.status !== 'deprovisioning' && !completedJobs.includes(job.id)) {
-                    if (job.provisioning > 0) {
-                        job.provisioning--;
-                        if (job.provisioning === 0) {
-                            logEvent(`${job.name} is now running`);
-                        }
-                    } else {
-                        job.daysRemaining--;
-                        if (job.daysRemaining <= 0) {
-                            completedJobs.push(job.id);
-                        }
+            function advanceDay() {
+                if (gameState.gameOver || gameState.victory) return;
+
+                gameState.day++;
+                gameState.capacityUsedToday = 0;
+
+                // Process deprovisioning first (uses sysadmin capacity)
+                const deproToProcess = [];
+                const capacityForDepro = Math.min(gameState.deproQueue.length, gameState.maxCapacity);
+
+                for (let i = 0; i < capacityForDepro; i++) {
+                    const depro = gameState.deproQueue.shift();
+                    if (depro) {
+                        deproToProcess.push(depro);
+                        gameState.capacityUsedToday++;
                     }
                 }
-            });
 
-            // Complete jobs - move to deprovisioning queue
-            completedJobs.forEach(jobId => {
-                const job = gameState.racks.find(j => j && j.id === jobId);
-                if (job) {
-                    // Mark racks as deprovisioning and queue them
-                    job.rackIndices.forEach(idx => {
-                        gameState.racks[idx] = {
-                            status: 'deprovisioning',
-                            team: job.team,
-                            name: job.name
-                        };
-                        gameState.deproQueue.push({
-                            rackIndex: idx,
-                            team: job.team,
-                            name: job.name
-                        });
-                    });
-                    gameState.jobsCompleted[job.team]++;
-                    adjustSatisfaction(job.team, 5);
-                    logEvent(`${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+5 ${job.team.toUpperCase()})`);
+                // Clear deprovisioned racks
+                deproToProcess.forEach((depro) => {
+                    gameState.racks[depro.rackIndex] = null;
+                });
+
+                if (deproToProcess.length > 0) {
+                    const rackCount = deproToProcess.length;
+                    logEvent(
+                        `Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`,
+                    );
                 }
-            });
 
-            // Process request deadlines
-            gameState.requests.forEach(request => {
-                request.daysWaiting++;
-                if (request.daysWaiting >= request.deadline) {
-                    // Missed deadline - bigger penalties
-                    gameState.jobsMissed[request.team]++;
-                    const penalty = request.isUrgent ? -20 : -12;
-                    adjustSatisfaction(request.team, penalty);
-                    logEvent(`MISSED: ${request.name} deadline expired (${penalty} ${request.team.toUpperCase()})`);
-                }
-            });
+                // Process jobs
+                const completedJobs = [];
+                gameState.racks.forEach((job) => {
+                    if (job && job.status !== 'deprovisioning' && !completedJobs.includes(job.id)) {
+                        if (job.provisioning > 0) {
+                            job.provisioning--;
+                            if (job.provisioning === 0) {
+                                logEvent(`${job.name} is now running`);
+                            }
+                        } else {
+                            job.daysRemaining--;
+                            if (job.daysRemaining <= 0) {
+                                completedJobs.push(job.id);
+                            }
+                        }
+                    }
+                });
 
-            // Remove expired requests
-            gameState.requests = gameState.requests.filter(r => r.daysWaiting < r.deadline);
-
-            // Generate new requests
-            if (shouldGenerateRequest()) {
-                const newRequest = generateRequest();
-                gameState.requests.push(newRequest);
-                logEvent(`New request: ${newRequest.name} (${newRequest.team.toUpperCase()})`);
-            }
-
-            // Check victory
-            if (gameState.day >= gameState.totalDays) {
-                gameState.victory = true;
-                showVictory();
-            }
-
-            updateDisplay();
-        }
-
-        function fastForward() {
-            // Advance 7 days or until something needs attention
-            for (let i = 0; i < 7; i++) {
-                if (gameState.gameOver || gameState.victory) break;
-                if (gameState.requests.some(r => r.deadline - r.daysWaiting <= 2)) break;
-                advanceDay();
-            }
-        }
-
-        // ============================================
-        // UI FUNCTIONS
-        // ============================================
-        function renderRacks() {
-            const floor = document.getElementById('rackFloor');
-            floor.innerHTML = '';
-
-            for (let row = 0; row < 3; row++) {
-                const rowLabel = document.createElement('div');
-                rowLabel.className = 'row-label';
-                rowLabel.textContent = `Row ${row + 1}`;
-                floor.appendChild(rowLabel);
-
-                for (let col = 0; col < 5; col++) {
-                    const idx = row * 5 + col;
-                    const rack = document.createElement('div');
-                    rack.className = 'rack';
-                    rack.dataset.index = idx;
-
-                    const job = gameState.racks[idx];
+                // Complete jobs - move to deprovisioning queue
+                completedJobs.forEach((jobId) => {
+                    const job = gameState.racks.find((j) => j && j.id === jobId);
                     if (job) {
-                        if (job.status === 'deprovisioning') {
-                            rack.classList.add('deprovisioning');
-                            rack.innerHTML = `
+                        // Mark racks as deprovisioning and queue them
+                        job.rackIndices.forEach((idx) => {
+                            gameState.racks[idx] = {
+                                status: 'deprovisioning',
+                                team: job.team,
+                                name: job.name,
+                            };
+                            gameState.deproQueue.push({
+                                rackIndex: idx,
+                                team: job.team,
+                                name: job.name,
+                            });
+                        });
+                        gameState.jobsCompleted[job.team]++;
+                        adjustSatisfaction(job.team, 5);
+                        logEvent(
+                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+5 ${job.team.toUpperCase()})`,
+                        );
+                    }
+                });
+
+                // Process request deadlines
+                gameState.requests.forEach((request) => {
+                    request.daysWaiting++;
+                    if (request.daysWaiting >= request.deadline) {
+                        // Missed deadline - bigger penalties
+                        gameState.jobsMissed[request.team]++;
+                        const penalty = request.isUrgent ? -20 : -12;
+                        adjustSatisfaction(request.team, penalty);
+                        logEvent(`MISSED: ${request.name} deadline expired (${penalty} ${request.team.toUpperCase()})`);
+                    }
+                });
+
+                // Remove expired requests
+                gameState.requests = gameState.requests.filter((r) => r.daysWaiting < r.deadline);
+
+                // Generate new requests
+                if (shouldGenerateRequest()) {
+                    const newRequest = generateRequest();
+                    gameState.requests.push(newRequest);
+                    logEvent(`New request: ${newRequest.name} (${newRequest.team.toUpperCase()})`);
+                }
+
+                // Check victory
+                if (gameState.day >= gameState.totalDays) {
+                    gameState.victory = true;
+                    showVictory();
+                }
+
+                updateDisplay();
+            }
+
+            function fastForward() {
+                // Advance 7 days or until something needs attention
+                for (let i = 0; i < 7; i++) {
+                    if (gameState.gameOver || gameState.victory) break;
+                    if (gameState.requests.some((r) => r.deadline - r.daysWaiting <= 2)) break;
+                    advanceDay();
+                }
+            }
+
+            // ============================================
+            // UI FUNCTIONS
+            // ============================================
+            function renderRacks() {
+                const floor = document.getElementById('rackFloor');
+                floor.innerHTML = '';
+
+                for (let row = 0; row < 3; row++) {
+                    const rowLabel = document.createElement('div');
+                    rowLabel.className = 'row-label';
+                    rowLabel.textContent = `Row ${row + 1}`;
+                    floor.appendChild(rowLabel);
+
+                    for (let col = 0; col < 5; col++) {
+                        const idx = row * 5 + col;
+                        const rack = document.createElement('div');
+                        rack.className = 'rack';
+                        rack.dataset.index = idx;
+
+                        const job = gameState.racks[idx];
+                        if (job) {
+                            if (job.status === 'deprovisioning') {
+                                rack.classList.add('deprovisioning');
+                                rack.innerHTML = `
                                 <div class="rack-job">Cleanup</div>
                                 <div class="rack-days">Queued</div>
                             `;
-                        } else {
-                            rack.classList.add(`occupied-${job.team}`);
-                            if (job.provisioning > 0) {
-                                rack.classList.add('provisioning');
-                            }
-                            rack.innerHTML = `
+                            } else {
+                                rack.classList.add(`occupied-${job.team}`);
+                                if (job.provisioning > 0) {
+                                    rack.classList.add('provisioning');
+                                }
+                                rack.innerHTML = `
                                 <div class="rack-job">${job.name}</div>
                                 <div class="rack-days">${job.provisioning > 0 ? 'Provisioning...' : job.daysRemaining + 'd left'}</div>
                             `;
+                            }
+                        } else {
+                            rack.innerHTML = `<div class="rack-label">${row + 1}-${col + 1}</div>`;
                         }
-                    } else {
-                        rack.innerHTML = `<div class="rack-label">${row + 1}-${col + 1}</div>`;
-                    }
 
-                    if (gameState.selectedRacks.includes(idx)) {
-                        rack.classList.add('selected');
-                    }
+                        if (gameState.selectedRacks.includes(idx)) {
+                            rack.classList.add('selected');
+                        }
 
-                    rack.addEventListener('click', () => handleRackClick(idx));
-                    floor.appendChild(rack);
+                        rack.addEventListener('click', () => handleRackClick(idx));
+                        floor.appendChild(rack);
+                    }
                 }
             }
-        }
 
-        function renderRequests() {
-            const queue = document.getElementById('requestQueue');
+            function renderRequests() {
+                const queue = document.getElementById('requestQueue');
 
-            if (gameState.requests.length === 0) {
-                queue.innerHTML = '<div style="opacity: 0.5; font-size: 12px;">No pending requests</div>';
-                return;
-            }
+                if (gameState.requests.length === 0) {
+                    queue.innerHTML = '<div style="opacity: 0.5; font-size: 12px;">No pending requests</div>';
+                    return;
+                }
 
-            queue.innerHTML = gameState.requests.map(req => {
-                // Show warning if job must be same-row
-                const sameRowNote = req.racks <= 5 && req.team !== 'rd'
-                    ? '<br><span class="request-adjacency">Same row required</span>'
-                    : (req.racks <= 5 && req.team === 'rd'
-                        ? '<br><span class="request-adjacency">Same row preferred</span>'
-                        : '');
-                return `
+                queue.innerHTML = gameState.requests
+                    .map((req) => {
+                        // Show warning if job must be same-row
+                        const sameRowNote =
+                            req.racks <= 5 && req.team !== 'rd'
+                                ? '<br><span class="request-adjacency">Same row required</span>'
+                                : req.racks <= 5 && req.team === 'rd'
+                                  ? '<br><span class="request-adjacency">Same row preferred</span>'
+                                  : '';
+                        return `
                 <div class="request-card ${req.isUrgent ? 'urgent' : ''} ${gameState.selectedRequest?.id === req.id ? 'selected' : ''}"
                      data-id="${req.id}">
                     <div class="request-team ${req.team}">${req.team.toUpperCase()}</div>
@@ -1127,176 +1104,178 @@
                         ${sameRowNote}
                     </div>
                 </div>
-            `}).join('');
+            `;
+                    })
+                    .join('');
 
-            // Add click handlers
-            queue.querySelectorAll('.request-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const id = parseFloat(card.dataset.id);
-                    const request = gameState.requests.find(r => r.id === id);
-                    if (request) {
-                        selectRequest(request);
-                    }
+                // Add click handlers
+                queue.querySelectorAll('.request-card').forEach((card) => {
+                    card.addEventListener('click', () => {
+                        const id = parseFloat(card.dataset.id);
+                        const request = gameState.requests.find((r) => r.id === id);
+                        if (request) {
+                            selectRequest(request);
+                        }
+                    });
                 });
-            });
-        }
-
-        function updateSatisfactionDisplay() {
-            ['rd', 'sales', 'benchmark'].forEach(team => {
-                const value = gameState.satisfaction[team];
-                const fill = document.getElementById(`${team}Fill`);
-                const valueEl = document.getElementById(`${team}Value`);
-
-                fill.style.width = `${value}%`;
-                fill.className = `satisfaction-fill ${getSatisfactionClass(value)}`;
-                valueEl.textContent = `${value}%`;
-            });
-        }
-
-        function updateDisplay() {
-            document.getElementById('dateDisplay').textContent = formatDate(gameState.day);
-            document.getElementById('dayCounter').textContent = `Day ${gameState.day} / ${gameState.totalDays}`;
-            document.getElementById('capacityUsed').textContent = gameState.capacityUsedToday;
-            document.getElementById('deproQueue').textContent = gameState.deproQueue.length;
-
-            renderRacks();
-            renderRequests();
-            updateSatisfactionDisplay();
-            updatePlaceButton();
-        }
-
-        function updatePlaceButton() {
-            const btn = document.getElementById('placeBtn');
-            const req = gameState.selectedRequest;
-
-            if (!req) {
-                btn.disabled = true;
-                btn.textContent = 'Place Job';
-                return;
             }
 
-            const neededRacks = req.racks;
-            const selectedCount = gameState.selectedRacks.length;
-            const capacityLeft = gameState.maxCapacity - gameState.capacityUsedToday;
+            function updateSatisfactionDisplay() {
+                ['rd', 'sales', 'benchmark'].forEach((team) => {
+                    const value = gameState.satisfaction[team];
+                    const fill = document.getElementById(`${team}Fill`);
+                    const valueEl = document.getElementById(`${team}Value`);
 
-            if (selectedCount < neededRacks) {
-                btn.disabled = true;
-                btn.textContent = `Select ${neededRacks - selectedCount} more rack${neededRacks - selectedCount > 1 ? 's' : ''}`;
-            } else if (selectedCount > neededRacks) {
-                btn.disabled = true;
-                btn.textContent = `Too many racks (need ${neededRacks})`;
-            } else if (neededRacks > capacityLeft) {
-                btn.disabled = true;
-                btn.textContent = `Over capacity (${capacityLeft} left)`;
-            } else {
-                // Check if placement would be allowed
-                const placement = canPlaceJob(req, gameState.selectedRacks);
-                if (!placement.allowed) {
+                    fill.style.width = `${value}%`;
+                    fill.className = `satisfaction-fill ${getSatisfactionClass(value)}`;
+                    valueEl.textContent = `${value}%`;
+                });
+            }
+
+            function updateDisplay() {
+                document.getElementById('dateDisplay').textContent = formatDate(gameState.day);
+                document.getElementById('dayCounter').textContent = `Day ${gameState.day} / ${gameState.totalDays}`;
+                document.getElementById('capacityUsed').textContent = gameState.capacityUsedToday;
+                document.getElementById('deproQueue').textContent = gameState.deproQueue.length;
+
+                renderRacks();
+                renderRequests();
+                updateSatisfactionDisplay();
+                updatePlaceButton();
+            }
+
+            function updatePlaceButton() {
+                const btn = document.getElementById('placeBtn');
+                const req = gameState.selectedRequest;
+
+                if (!req) {
                     btn.disabled = true;
-                    btn.textContent = 'Must be same row';
-                } else if (placement.penalty) {
-                    btn.disabled = false;
-                    btn.textContent = `Place (${placement.penalty} penalty)`;
-                } else {
-                    btn.disabled = false;
                     btn.textContent = 'Place Job';
-                }
-            }
-        }
-
-        function logEvent(message) {
-            const log = document.getElementById('eventLog');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `<span class="log-day">Day ${gameState.day}:</span> ${message}`;
-            log.insertBefore(entry, log.firstChild);
-
-            // Keep only last 50 entries
-            while (log.children.length > 50) {
-                log.removeChild(log.lastChild);
-            }
-        }
-
-        // ============================================
-        // INPUT HANDLERS
-        // ============================================
-        function selectRequest(request) {
-            if (gameState.selectedRequest?.id === request.id) {
-                gameState.selectedRequest = null;
-                gameState.selectedRacks = [];
-            } else {
-                gameState.selectedRequest = request;
-                gameState.selectedRacks = [];
-            }
-            updateDisplay();
-        }
-
-        function handleRackClick(index) {
-            if (!gameState.selectedRequest) return;
-            // Can't place on occupied or deprovisioning racks
-            if (gameState.racks[index] !== null) return;
-
-            const idx = gameState.selectedRacks.indexOf(index);
-            if (idx >= 0) {
-                gameState.selectedRacks.splice(idx, 1);
-            } else {
-                gameState.selectedRacks.push(index);
-            }
-
-            updateDisplay();
-        }
-
-        function handlePlace() {
-            const req = gameState.selectedRequest;
-            if (!req) return;
-            if (gameState.selectedRacks.length !== req.racks) return;
-            if (req.racks > gameState.maxCapacity - gameState.capacityUsedToday) return;
-
-            placeJob(req, [...gameState.selectedRacks]);
-        }
-
-        // ============================================
-        // GAME OVER / VICTORY
-        // ============================================
-        function checkGameOver() {
-            const teams = ['rd', 'sales', 'benchmark'];
-            for (const team of teams) {
-                if (gameState.satisfaction[team] < 20) {
-                    gameState.gameOver = true;
-                    showGameOver(team);
                     return;
                 }
+
+                const neededRacks = req.racks;
+                const selectedCount = gameState.selectedRacks.length;
+                const capacityLeft = gameState.maxCapacity - gameState.capacityUsedToday;
+
+                if (selectedCount < neededRacks) {
+                    btn.disabled = true;
+                    btn.textContent = `Select ${neededRacks - selectedCount} more rack${neededRacks - selectedCount > 1 ? 's' : ''}`;
+                } else if (selectedCount > neededRacks) {
+                    btn.disabled = true;
+                    btn.textContent = `Too many racks (need ${neededRacks})`;
+                } else if (neededRacks > capacityLeft) {
+                    btn.disabled = true;
+                    btn.textContent = `Over capacity (${capacityLeft} left)`;
+                } else {
+                    // Check if placement would be allowed
+                    const placement = canPlaceJob(req, gameState.selectedRacks);
+                    if (!placement.allowed) {
+                        btn.disabled = true;
+                        btn.textContent = 'Must be same row';
+                    } else if (placement.penalty) {
+                        btn.disabled = false;
+                        btn.textContent = `Place (${placement.penalty} penalty)`;
+                    } else {
+                        btn.disabled = false;
+                        btn.textContent = 'Place Job';
+                    }
+                }
             }
-        }
 
-        function showGameOver(failedTeam) {
-            const modal = document.getElementById('gameOverModal');
-            const reason = document.getElementById('gameOverReason');
-            const stats = document.getElementById('gameOverStats');
+            function logEvent(message) {
+                const log = document.getElementById('eventLog');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `<span class="log-day">Day ${gameState.day}:</span> ${message}`;
+                log.insertBefore(entry, log.firstChild);
 
-            const teamNames = { rd: 'R&D', sales: 'Sales', benchmark: 'Benchmark' };
-            reason.textContent = `${teamNames[failedTeam]} satisfaction dropped below 20%.`;
+                // Keep only last 50 entries
+                while (log.children.length > 50) {
+                    log.removeChild(log.lastChild);
+                }
+            }
 
-            const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
-            const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
+            // ============================================
+            // INPUT HANDLERS
+            // ============================================
+            function selectRequest(request) {
+                if (gameState.selectedRequest?.id === request.id) {
+                    gameState.selectedRequest = null;
+                    gameState.selectedRacks = [];
+                } else {
+                    gameState.selectedRequest = request;
+                    gameState.selectedRacks = [];
+                }
+                updateDisplay();
+            }
 
-            stats.innerHTML = `
+            function handleRackClick(index) {
+                if (!gameState.selectedRequest) return;
+                // Can't place on occupied or deprovisioning racks
+                if (gameState.racks[index] !== null) return;
+
+                const idx = gameState.selectedRacks.indexOf(index);
+                if (idx >= 0) {
+                    gameState.selectedRacks.splice(idx, 1);
+                } else {
+                    gameState.selectedRacks.push(index);
+                }
+
+                updateDisplay();
+            }
+
+            function handlePlace() {
+                const req = gameState.selectedRequest;
+                if (!req) return;
+                if (gameState.selectedRacks.length !== req.racks) return;
+                if (req.racks > gameState.maxCapacity - gameState.capacityUsedToday) return;
+
+                placeJob(req, [...gameState.selectedRacks]);
+            }
+
+            // ============================================
+            // GAME OVER / VICTORY
+            // ============================================
+            function checkGameOver() {
+                const teams = ['rd', 'sales', 'benchmark'];
+                for (const team of teams) {
+                    if (gameState.satisfaction[team] < 20) {
+                        gameState.gameOver = true;
+                        showGameOver(team);
+                        return;
+                    }
+                }
+            }
+
+            function showGameOver(failedTeam) {
+                const modal = document.getElementById('gameOverModal');
+                const reason = document.getElementById('gameOverReason');
+                const stats = document.getElementById('gameOverStats');
+
+                const teamNames = { rd: 'R&D', sales: 'Sales', benchmark: 'Benchmark' };
+                reason.textContent = `${teamNames[failedTeam]} satisfaction dropped below 20%.`;
+
+                const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
+                const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
+
+                stats.innerHTML = `
                 Survived ${gameState.day} days (${formatDate(gameState.day)})<br>
                 Jobs completed: ${totalCompleted}<br>
                 Jobs missed: ${totalMissed}
             `;
 
-            modal.classList.add('active');
-        }
+                modal.classList.add('active');
+            }
 
-        function showVictory() {
-            const modal = document.getElementById('victoryModal');
-            const stats = document.getElementById('victoryStats');
+            function showVictory() {
+                const modal = document.getElementById('victoryModal');
+                const stats = document.getElementById('victoryStats');
 
-            const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
-            const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
+                const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
+                const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
 
-            stats.innerHTML = `
+                stats.innerHTML = `
                 Final satisfaction:<br>
                 R&D: ${gameState.satisfaction.rd}% |
                 Sales: ${gameState.satisfaction.sales}% |
@@ -1305,29 +1284,29 @@
                 Jobs missed: ${totalMissed}
             `;
 
-            modal.classList.add('active');
-        }
-
-        // ============================================
-        // INITIALIZATION
-        // ============================================
-        function init() {
-            // Generate initial requests - start with pressure
-            for (let i = 0; i < 3; i++) {
-                gameState.requests.push(generateRequest());
+                modal.classList.add('active');
             }
 
-            // Set up event listeners
-            document.getElementById('placeBtn').addEventListener('click', handlePlace);
-            document.getElementById('advanceBtn').addEventListener('click', advanceDay);
-            document.getElementById('fastForwardBtn').addEventListener('click', fastForward);
+            // ============================================
+            // INITIALIZATION
+            // ============================================
+            function init() {
+                // Generate initial requests - start with pressure
+                for (let i = 0; i < 3; i++) {
+                    gameState.requests.push(generateRequest());
+                }
 
-            updateDisplay();
-            logEvent('Welcome to 2015. Your datacenter awaits.');
-        }
+                // Set up event listeners
+                document.getElementById('placeBtn').addEventListener('click', handlePlace);
+                document.getElementById('advanceBtn').addEventListener('click', advanceDay);
+                document.getElementById('fastForwardBtn').addEventListener('click', fastForward);
 
-        // Start the game
-        init();
-    </script>
-</body>
+                updateDisplay();
+                logEvent('Welcome to 2015. Your datacenter awaits.');
+            }
+
+            // Start the game
+            init();
+        </script>
+    </body>
 </html>
