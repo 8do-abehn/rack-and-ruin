@@ -1,0 +1,21 @@
+{
+  "name": "rack-and-ruin",
+  "version": "1.0.0",
+  "description": "Datacenter scheduling simulation game",
+  "scripts": {
+    "lint": "npm run lint:html && npm run lint:js",
+    "lint:html": "htmlhint index.html",
+    "lint:js": "eslint --ext .html .",
+    "lint:fix": "eslint --ext .html . --fix",
+    "format": "prettier --write index.html",
+    "format:check": "prettier --check index.html"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-plugin-html": "^8.0.0",
+    "htmlhint": "^1.1.4",
+    "prettier": "^3.2.0"
+  },
+  "keywords": ["game", "simulation", "datacenter"],
+  "license": "MIT"
+}
