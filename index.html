@@ -675,40 +675,40 @@
         const requestTemplates = {
             rd: [
                 // Adjacency required - hardware/interconnect testing
-                { name: "DDR4 validation cluster", racks: 4, duration: 14, adjacency: true },
-                { name: "100GbE integration test", racks: 3, duration: 12, adjacency: true },
-                { name: "EPYC Naples validation", racks: 5, duration: 21, adjacency: true },
-                { name: "InfiniBand fabric test", racks: 4, duration: 10, adjacency: true },
+                { name: 'DDR4 validation cluster', racks: 4, duration: 14, adjacency: true },
+                { name: '100GbE integration test', racks: 3, duration: 12, adjacency: true },
+                { name: 'EPYC Naples validation', racks: 5, duration: 21, adjacency: true },
+                { name: 'InfiniBand fabric test', racks: 4, duration: 10, adjacency: true },
                 // No adjacency required - software/single-node testing
-                { name: "Broadwell-EP firmware update", racks: 3, duration: 21, adjacency: false },
-                { name: "NVMe driver validation", racks: 2, duration: 10, adjacency: false },
-                { name: "Skylake BIOS testing", racks: 4, duration: 18, adjacency: false },
-                { name: "PCIe 4.0 compatibility", racks: 2, duration: 7, adjacency: false },
-                { name: "Optane memory testing", racks: 3, duration: 14, adjacency: false }
+                { name: 'Broadwell-EP firmware update', racks: 3, duration: 21, adjacency: false },
+                { name: 'NVMe driver validation', racks: 2, duration: 10, adjacency: false },
+                { name: 'Skylake BIOS testing', racks: 4, duration: 18, adjacency: false },
+                { name: 'PCIe 4.0 compatibility', racks: 2, duration: 7, adjacency: false },
+                { name: 'Optane memory testing', racks: 3, duration: 14, adjacency: false }
             ],
             sales: [
                 // Sales demos never require adjacency
-                { name: "ORNL demo", racks: 2, duration: 5, adjacency: false },
-                { name: "Stanford AI showcase", racks: 3, duration: 7, adjacency: false },
-                { name: "NASA simulation demo", racks: 2, duration: 5, adjacency: false },
-                { name: "Nexus Automotive POC", racks: 2, duration: 7, adjacency: false },
-                { name: "Stratos Aerospace CFD demo", racks: 3, duration: 5, adjacency: false },
-                { name: "MIT research preview", racks: 2, duration: 7, adjacency: false },
-                { name: "LANL competitive eval", racks: 3, duration: 10, adjacency: false },
-                { name: "Helix Genomics pipeline", racks: 2, duration: 5, adjacency: false },
-                { name: "UW-Madison Space Science", racks: 2, duration: 7, adjacency: false },
-                { name: "Argonne materials demo", racks: 3, duration: 5, adjacency: false }
+                { name: 'ORNL demo', racks: 2, duration: 5, adjacency: false },
+                { name: 'Stanford AI showcase', racks: 3, duration: 7, adjacency: false },
+                { name: 'NASA simulation demo', racks: 2, duration: 5, adjacency: false },
+                { name: 'Nexus Automotive POC', racks: 2, duration: 7, adjacency: false },
+                { name: 'Stratos Aerospace CFD demo', racks: 3, duration: 5, adjacency: false },
+                { name: 'MIT research preview', racks: 2, duration: 7, adjacency: false },
+                { name: 'LANL competitive eval', racks: 3, duration: 10, adjacency: false },
+                { name: 'Helix Genomics pipeline', racks: 2, duration: 5, adjacency: false },
+                { name: 'UW-Madison Space Science', racks: 2, duration: 7, adjacency: false },
+                { name: 'Argonne materials demo', racks: 3, duration: 5, adjacency: false }
             ],
             benchmark: [
                 // Benchmarks ALWAYS require adjacency - results invalid otherwise
-                { name: "Intel vs AMD comparison", racks: 6, duration: 14, adjacency: true },
-                { name: "GPU compute scaling", racks: 4, duration: 10, adjacency: true },
-                { name: "Storage throughput test", racks: 5, duration: 12, adjacency: true },
-                { name: "Network latency analysis", racks: 4, duration: 7, adjacency: true },
-                { name: "Memory bandwidth study", racks: 4, duration: 10, adjacency: true },
-                { name: "Power efficiency audit", racks: 6, duration: 14, adjacency: true },
-                { name: "MPI scaling benchmark", racks: 5, duration: 10, adjacency: true },
-                { name: "LINPACK validation", racks: 6, duration: 7, adjacency: true }
+                { name: 'Intel vs AMD comparison', racks: 6, duration: 14, adjacency: true },
+                { name: 'GPU compute scaling', racks: 4, duration: 10, adjacency: true },
+                { name: 'Storage throughput test', racks: 5, duration: 12, adjacency: true },
+                { name: 'Network latency analysis', racks: 4, duration: 7, adjacency: true },
+                { name: 'Memory bandwidth study', racks: 4, duration: 10, adjacency: true },
+                { name: 'Power efficiency audit', racks: 6, duration: 14, adjacency: true },
+                { name: 'MPI scaling benchmark', racks: 5, duration: 10, adjacency: true },
+                { name: 'LINPACK validation', racks: 6, duration: 7, adjacency: true }
             ]
         };
 
@@ -721,7 +721,7 @@
             currentDate.setDate(startDate.getDate() + day - 1);
 
             const months = ['January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
+                'July', 'August', 'September', 'October', 'November', 'December'];
 
             return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
         }
@@ -885,17 +885,17 @@
 
             // Cross-row placement for jobs that could fit in one row
             switch (request.team) {
-                case 'rd':
-                    // R&D tolerates it but not happy
-                    return { allowed: true, penalty: -8, reason: 'Cross-switch placement suboptimal' };
-                case 'sales':
-                    // Sales won't accept it
-                    return { allowed: false, reason: 'Sales requires same-row placement for demos' };
-                case 'benchmark':
-                    // Benchmark results would be invalid
-                    return { allowed: false, reason: 'Benchmark requires same-row for valid results' };
-                default:
-                    return { allowed: true, penalty: 0 };
+            case 'rd':
+                // R&D tolerates it but not happy
+                return { allowed: true, penalty: -8, reason: 'Cross-switch placement suboptimal' };
+            case 'sales':
+                // Sales won't accept it
+                return { allowed: false, reason: 'Sales requires same-row placement for demos' };
+            case 'benchmark':
+                // Benchmark results would be invalid
+                return { allowed: false, reason: 'Benchmark requires same-row for valid results' };
+            default:
+                return { allowed: true, penalty: 0 };
             }
         }
 
@@ -1127,7 +1127,7 @@
                         ${sameRowNote}
                     </div>
                 </div>
-            `}).join('');
+            `;}).join('');
 
             // Add click handlers
             queue.querySelectorAll('.request-card').forEach(card => {
