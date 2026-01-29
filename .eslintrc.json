@@ -13,7 +13,7 @@
     "no-console": "off",
     "semi": ["error", "always"],
     "quotes": ["warn", "single", { "avoidEscape": true }],
-    "indent": ["warn", 4],
+    "indent": "off",
     "no-trailing-spaces": "warn",
     "eol-last": "warn"
   }

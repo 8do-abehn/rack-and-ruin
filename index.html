@@ -758,13 +758,6 @@
                 return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
             }
 
-            function getYear(day) {
-                const startDate = new Date(2015, 0, 1);
-                const currentDate = new Date(startDate);
-                currentDate.setDate(startDate.getDate() + day - 1);
-                return currentDate.getFullYear();
-            }
-
             function randomInt(min, max) {
                 return Math.floor(Math.random() * (max - min + 1)) + min;
             }
@@ -778,62 +771,6 @@
             // ============================================
             function getRackRow(index) {
                 return Math.floor(index / 5);
-            }
-
-            function getRackCol(index) {
-                return index % 5;
-            }
-
-            function areRacksAdjacent(indices) {
-                if (indices.length <= 1) return true;
-
-                const rows = indices.map((i) => getRackRow(i));
-                const cols = indices.map((i) => getRackCol(i));
-
-                // All must be in same row
-                if (new Set(rows).size !== 1) return false;
-
-                // Columns must be contiguous
-                cols.sort((a, b) => a - b);
-                for (let i = 1; i < cols.length; i++) {
-                    if (cols[i] - cols[i - 1] !== 1) return false;
-                }
-
-                return true;
-            }
-
-            function findAvailableRacks(count, requireAdjacency) {
-                const available = [];
-
-                for (let i = 0; i < 15; i++) {
-                    if (gameState.racks[i] === null) {
-                        available.push(i);
-                    }
-                }
-
-                if (available.length < count) return null;
-
-                if (!requireAdjacency) {
-                    return available.slice(0, count);
-                }
-
-                // Find contiguous racks in same row
-                for (let row = 0; row < 3; row++) {
-                    let consecutive = [];
-                    for (let col = 0; col < 5; col++) {
-                        const idx = row * 5 + col;
-                        if (gameState.racks[idx] === null) {
-                            consecutive.push(idx);
-                            if (consecutive.length >= count) {
-                                return consecutive.slice(0, count);
-                            }
-                        } else {
-                            consecutive = [];
-                        }
-                    }
-                }
-
-                return null;
             }
 
             // ============================================
@@ -1006,7 +943,7 @@
 
                 // Process jobs
                 const completedJobs = [];
-                gameState.racks.forEach((job, idx) => {
+                gameState.racks.forEach((job) => {
                     if (job && job.status !== 'deprovisioning' && !completedJobs.includes(job.id)) {
                         if (job.provisioning > 0) {
                             job.provisioning--;
