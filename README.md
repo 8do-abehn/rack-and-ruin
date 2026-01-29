@@ -1,6 +1,6 @@
 # Rack & Ruin
 
-**[Play Now](https://8do-abehn.github.io/rack-and-ruin/)**
+**[Play Now](https://rnr.8devops.com)**
 
 A datacenter scheduling simulation game. Manage rack allocations for competing teams (R&D, Sales, Benchmark) across a 10-year timeline (2015-2025).
 
