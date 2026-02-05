@@ -234,7 +234,8 @@ Upgrades:
 - Power/cooling meters at top
 
 ### Rack Zoom View
-- Click any rack → zoom to 40U view
+- Mouse scroll/pinch to zoom in on racks
+- Zoom in far enough → see 42U detail view
 - See every piece of equipment
 - Drag to rearrange (costs worker time)
 - Visual: LEDs blinking, fans spinning
