@@ -542,3 +542,67 @@ Follow the rise and challenges of running a national lab computing center throug
 
 ### Victory Condition
 > "1994. The T3D cluster hums. Massively parallel is the future. But those beautiful vector machines... they were something special."
+
+---
+
+## Future: Scoreboard System
+
+### Design Goals
+- **Extensible**: Easy to add new metrics without breaking existing scores
+- **Backwards Compatible**: Old saves work with new metric additions
+- **Comparable**: Scores meaningful across different campaign lengths
+
+### Score Schema (v1)
+```json
+{
+  "version": 1,
+  "timestamp": "ISO8601",
+  "campaign": {
+    "startYear": 1995,
+    "endYear": 2025,
+    "length": 30
+  },
+  "metrics": {
+    "jobsCompleted": 0,
+    "jobsMissed": 0,
+    "peakTFLOPS": 0,
+    "peakRacks": 0,
+    "peakStaff": 0,
+    "totalRevenue": 0,
+    "totalSpent": 0,
+    "avgSatisfaction": 0,
+    "minSatisfaction": 100,
+    "eventsHandled": 0,
+    "upgradesPurchased": 0,
+    "teamsRetained": 4
+  },
+  "achievements": [],
+  "extensionData": {}
+}
+```
+
+### Backwards Compatibility Rules
+1. **New metrics default to null/0** - Missing fields get sensible defaults
+2. **Never remove fields** - Deprecate instead (prefix with `_deprecated_`)
+3. **Version field required** - Schema migrations based on version number
+4. **extensionData bag** - Future additions can use this without schema changes
+
+### Potential Future Metrics
+- Power efficiency (TFLOPS/kW)
+- Carbon footprint
+- Uptime percentage
+- Staff turnover rate
+- Cloud migrations prevented
+- Hardware failures survived
+- Speed run time (real-world minutes)
+
+### Leaderboard Categories
+| Category | Metric | Description |
+|----------|--------|-------------|
+| Efficiency King | TFLOPS/kW | Best power efficiency at end |
+| Job Machine | jobsCompleted | Most jobs completed |
+| Staff Minimalist | peakStaff | Lowest staff at victory |
+| Budget Hero | totalSpent | Lowest spending at victory |
+| Satisfaction Pro | avgSatisfaction | Highest average satisfaction |
+| Speed Runner | realTimeMinutes | Fastest completion |
+| Survivor | eventsHandled | Most crises weathered |
