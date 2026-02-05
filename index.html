@@ -627,6 +627,52 @@
                     background-color 0.3s;
             }
 
+            /* Stats Panel */
+            .stats-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+            }
+
+            .stats-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .stats-panel h2::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s;
+            }
+
+            .stats-panel.collapsed h2::after {
+                transform: rotate(-90deg);
+            }
+
+            .stats-panel.collapsed .stats-content {
+                display: none;
+            }
+
+            .stats-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 2px 0;
+                font-size: clamp(9px, 1vw, 12px);
+            }
+
+            .stats-value {
+                font-weight: bold;
+                color: var(--accent-blue);
+            }
+
             /* Staff Panel */
             .staff-panel {
                 background: rgba(20, 30, 50, 0.8);
@@ -1513,6 +1559,25 @@
                                     <span>Year:</span>
                                     <span id="budgetYear">2015</span>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datacenter Stats Panel -->
+                    <div class="stats-panel" id="statsPanel">
+                        <h2 onclick="togglePanel('statsPanel')">Datacenter</h2>
+                        <div class="stats-content">
+                            <div class="stats-row">
+                                <span>Compute:</span>
+                                <span class="stats-value" id="tflopsDisplay">0.00 TFLOPS</span>
+                            </div>
+                            <div class="stats-row">
+                                <span>Racks Online:</span>
+                                <span class="stats-value" id="racksOnlineDisplay">0 / 9</span>
+                            </div>
+                            <div class="stats-row">
+                                <span>Hardware Gen:</span>
+                                <span class="stats-value" id="hardwareGenDisplay">Gen 1</span>
                             </div>
                         </div>
                     </div>
@@ -3839,6 +3904,41 @@
                 yearEl.textContent = getCalendarYear();
             }
 
+            function calculateTFLOPS() {
+                // Count occupied racks
+                const occupiedRacks = gameState.racks.filter((r) => r !== null).length;
+
+                // Base TFLOPS per rack (scales with hardware generation)
+                // Gen 1: 0.1 TFLOPS, Gen 2: 0.2, Gen 3: 0.4
+                const baseTFLOPS = 0.1;
+                const genMultiplier = Math.pow(2, gameState.upgrades.hardwareGen - 1);
+
+                return occupiedRacks * baseTFLOPS * genMultiplier;
+            }
+
+            function updateStatsDisplay() {
+                const tflopsEl = document.getElementById('tflopsDisplay');
+                const racksEl = document.getElementById('racksOnlineDisplay');
+                const genEl = document.getElementById('hardwareGenDisplay');
+
+                if (!tflopsEl) return;
+
+                const tflops = calculateTFLOPS();
+                const occupiedRacks = gameState.racks.filter((r) => r !== null).length;
+
+                // Format TFLOPS with appropriate unit
+                if (tflops >= 1000) {
+                    tflopsEl.textContent = `${(tflops / 1000).toFixed(2)} PFLOPS`;
+                } else if (tflops >= 1) {
+                    tflopsEl.textContent = `${tflops.toFixed(2)} TFLOPS`;
+                } else {
+                    tflopsEl.textContent = `${(tflops * 1000).toFixed(0)} GFLOPS`;
+                }
+
+                racksEl.textContent = `${occupiedRacks} / ${gameState.rackCount}`;
+                genEl.textContent = `Gen ${gameState.upgrades.hardwareGen}`;
+            }
+
             function updateDisplay() {
                 document.getElementById('dateDisplay').textContent = formatDate(gameState.day);
                 document.getElementById('dayCounter').textContent = `Day ${gameState.day} / ${gameState.totalDays}`;
@@ -3853,6 +3953,7 @@
                 renderStaffRoster();
                 renderUpgrades();
                 updateBudgetDisplay();
+                updateStatsDisplay();
                 updateStaffBreakdown();
             }
 
