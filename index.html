@@ -1290,6 +1290,40 @@
                 font-size: clamp(7px, 0.8vw, 10px);
             }
 
+            /* Rack purchase section */
+            .rack-purchase {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px;
+                background: rgba(40, 50, 70, 0.6);
+                border: 1px solid var(--grid-line);
+                margin-bottom: 8px;
+            }
+
+            .rack-purchase-info {
+                font-size: clamp(10px, 1vw, 12px);
+            }
+
+            .buy-rack-btn {
+                background: rgba(40, 60, 100, 0.8);
+                border: 1px solid var(--accent-blue);
+                color: var(--text-color);
+                padding: 6px 12px;
+                font-size: clamp(9px, 0.9vw, 11px);
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .buy-rack-btn:hover:not(:disabled) {
+                background: rgba(60, 80, 120, 0.8);
+            }
+
+            .buy-rack-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
             /* Story notification bar */
             .story-bar {
                 background: linear-gradient(90deg, rgba(74, 158, 255, 0.2), transparent);
@@ -1728,6 +1762,14 @@
                     <div class="hardware-panel hidden" id="hardwarePanel">
                         <h2 onclick="togglePanel('hardwarePanel')">Hardware</h2>
                         <div class="hardware-content">
+                            <div class="rack-purchase">
+                                <div class="rack-purchase-info">
+                                    <span>Racks: <strong id="ownedRacksDisplay">3</strong> / 15</span>
+                                </div>
+                                <button class="buy-rack-btn" id="buyRackBtn" onclick="buyRack()">
+                                    Buy Rack $2,000
+                                </button>
+                            </div>
                             <div class="upgrade-grid" id="upgradeGrid">
                                 <!-- Upgrades rendered by JS -->
                             </div>
@@ -1871,7 +1913,7 @@
         <script>
             /* eslint-disable no-unused-vars */
             // Functions used by onclick handlers in HTML:
-            // selectCampaign, closeCloudProposal, purchaseUpgrade, hireStaff, fireStaff, togglePanel, startGame, continueGame, newGameConfirm, clearSave, upgradePower, upgradeCooling
+            // selectCampaign, closeCloudProposal, purchaseUpgrade, hireStaff, fireStaff, togglePanel, startGame, continueGame, newGameConfirm, clearSave, upgradePower, upgradeCooling, buyRack
             // Future features (not yet wired up): specializeRack, getStaffCapacityBonus
 
             // ============================================
@@ -1904,6 +1946,7 @@
                     { capacity: 200, cost: 100000, name: '200kW Transformer' },
                     { capacity: 500, cost: 200000, name: '500kW Service' },
                 ],
+                RACK_COST: 2000, // Cost per rack
                 COOLING_UPGRADES: [
                     { capacity: 40, cost: 0, name: 'Basic CRAC' },
                     { capacity: 80, cost: 40000, name: '80 Ton CRAC' },
@@ -4210,6 +4253,47 @@
                 updateDisplay();
             }
 
+            function buyRack() {
+                if (gameState.ownedRacks >= gameState.maxRackSlots) {
+                    logEvent('Maximum rack capacity reached');
+                    return;
+                }
+
+                if (gameState.budget.current < CONFIG.RACK_COST) {
+                    logEvent(`Cannot afford rack ($${CONFIG.RACK_COST.toLocaleString()} needed)`);
+                    return;
+                }
+
+                gameState.budget.current -= CONFIG.RACK_COST;
+                gameState.ownedRacks++;
+                gameState.rackCount = gameState.ownedRacks;
+                gameState.racks.push(null); // Add empty rack slot
+
+                logEvent(`Purchased rack #${gameState.ownedRacks} for $${CONFIG.RACK_COST.toLocaleString()}`);
+                updateDisplay();
+            }
+
+            function updateRackPurchaseDisplay() {
+                const ownedDisplay = document.getElementById('ownedRacksDisplay');
+                const buyBtn = document.getElementById('buyRackBtn');
+
+                if (!ownedDisplay || !buyBtn) return;
+
+                ownedDisplay.textContent = gameState.ownedRacks;
+
+                // Disable if at max or can't afford
+                if (gameState.ownedRacks >= gameState.maxRackSlots) {
+                    buyBtn.disabled = true;
+                    buyBtn.textContent = 'Max Racks';
+                } else if (gameState.budget.current < CONFIG.RACK_COST) {
+                    buyBtn.disabled = true;
+                    buyBtn.textContent = `Buy Rack $${CONFIG.RACK_COST.toLocaleString()}`;
+                } else {
+                    buyBtn.disabled = false;
+                    buyBtn.textContent = `Buy Rack $${CONFIG.RACK_COST.toLocaleString()}`;
+                }
+            }
+
             function updateStatsDisplay() {
                 const tflopsEl = document.getElementById('tflopsDisplay');
                 const racksEl = document.getElementById('racksOnlineDisplay');
@@ -4305,6 +4389,7 @@
                 updateBudgetDisplay();
                 updateStatsDisplay();
                 updateStaffBreakdown();
+                updateRackPurchaseDisplay();
             }
 
             function updatePlaceButton() {
