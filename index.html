@@ -22,8 +22,17 @@
                 --rack-rd: #4a7a4a;
                 --rack-sales: #7a4a7a;
                 --rack-benchmark: #4a4a7a;
+                --rack-ai: #7a5a2a;
                 --danger: #ff4a4a;
                 --success: #4aff4a;
+                --budget-green: #4aff4a;
+                --budget-yellow: #ffaa00;
+                --budget-red: #ff4a4a;
+                /* Staff uniform colors */
+                --staff-network: #3498db;
+                --staff-storage: #9b59b6;
+                --staff-compute: #e74c3c;
+                --staff-generalist: #95a5a6;
             }
 
             html,
@@ -120,11 +129,15 @@
 
             .rack-floor {
                 display: grid;
-                grid-template-columns: repeat(5, 1fr);
-                grid-template-rows: auto 1fr auto 1fr auto 1fr;
+                grid-template-columns: repeat(3, 1fr);
                 gap: 0.8vh 0.8vw;
                 flex: 1;
                 min-height: 0;
+                align-content: start;
+            }
+
+            .satisfaction-row.hidden {
+                display: none;
             }
 
             .rack {
@@ -531,17 +544,801 @@
                 font-size: 12px;
                 margin-top: 5px;
             }
+
+            /* Budget Panel */
+            .budget-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+                transition: opacity 0.5s, max-height 0.5s;
+            }
+
+            .budget-panel.hidden {
+                display: none;
+            }
+
+            .budget-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .budget-panel h2::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s;
+            }
+
+            .budget-panel.collapsed h2::after {
+                transform: rotate(-90deg);
+            }
+
+            .budget-panel.collapsed .budget-content {
+                display: none;
+            }
+
+            .budget-info {
+                font-size: clamp(9px, 1vw, 12px);
+            }
+
+            .budget-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 2px 0;
+            }
+
+            .budget-amount {
+                font-weight: bold;
+            }
+
+            .budget-amount.healthy {
+                color: var(--budget-green);
+            }
+
+            .budget-amount.warning {
+                color: var(--budget-yellow);
+            }
+
+            .budget-amount.danger {
+                color: var(--budget-red);
+            }
+
+            .budget-bar {
+                height: 8px;
+                background: rgba(40, 50, 70, 0.8);
+                border: 1px solid var(--grid-line);
+                margin: 5px 0;
+            }
+
+            .budget-fill {
+                height: 100%;
+                transition: width 0.3s, background-color 0.3s;
+            }
+
+            /* Staff Panel */
+            .staff-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+                transition: opacity 0.5s, max-height 0.5s;
+            }
+
+            .staff-panel.hidden {
+                display: none;
+            }
+
+            .staff-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .staff-panel h2::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s;
+            }
+
+            .staff-panel.collapsed h2::after {
+                transform: rotate(-90deg);
+            }
+
+            .staff-panel.collapsed .staff-content {
+                display: none;
+            }
+
+            .staff-roster {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin: 8px 0;
+            }
+
+            /* Staff figure - tilted top-down view */
+            .staff-figure {
+                width: 24px;
+                height: 32px;
+                position: relative;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+
+            .staff-figure:hover {
+                transform: scale(1.1);
+            }
+
+            .staff-figure .head {
+                width: 12px;
+                height: 12px;
+                background: #f5d0c5;
+                border-radius: 50%;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 1px solid rgba(0,0,0,0.2);
+            }
+
+            .staff-figure .body {
+                width: 18px;
+                height: 16px;
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 4px 4px 2px 2px;
+                border: 1px solid rgba(0,0,0,0.2);
+            }
+
+            .staff-figure .legs {
+                width: 14px;
+                height: 6px;
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 2px;
+            }
+
+            .staff-figure .leg {
+                flex: 1;
+                background: #2a3a4a;
+                border-radius: 0 0 2px 2px;
+            }
+
+            .staff-figure.network .body { background: var(--staff-network); }
+            .staff-figure.storage .body { background: var(--staff-storage); }
+            .staff-figure.compute .body { background: var(--staff-compute); }
+            .staff-figure.generalist .body { background: var(--staff-generalist); }
+
+            .staff-figure .specialty-badge {
+                position: absolute;
+                bottom: -12px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 8px;
+                white-space: nowrap;
+                opacity: 0.7;
+            }
+
+            .staff-hire-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                margin-top: 8px;
+            }
+
+            .staff-hire-btn {
+                padding: 4px 8px;
+                font-size: clamp(8px, 0.9vw, 11px);
+                background: rgba(40, 50, 70, 0.8);
+                border: 1px solid var(--grid-line);
+                color: var(--text-color);
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .staff-hire-btn:hover {
+                border-color: var(--accent-blue);
+            }
+
+            .staff-hire-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .staff-hire-btn.network { border-left: 3px solid var(--staff-network); }
+            .staff-hire-btn.storage { border-left: 3px solid var(--staff-storage); }
+            .staff-hire-btn.compute { border-left: 3px solid var(--staff-compute); }
+            .staff-hire-btn.generalist { border-left: 3px solid var(--staff-generalist); }
+
+            /* Animated workers on datacenter floor */
+            .datacenter {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .floor-worker {
+                position: absolute;
+                width: 20px;
+                height: 28px;
+                z-index: 50;
+                pointer-events: none;
+                transition: left 1.2s ease-in-out, top 1.2s ease-in-out;
+            }
+
+            .floor-worker .worker-head {
+                width: 10px;
+                height: 10px;
+                background: #f5d0c5;
+                border-radius: 50%;
+                position: absolute;
+                top: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 1px solid rgba(0,0,0,0.3);
+            }
+
+            .floor-worker .worker-body {
+                width: 14px;
+                height: 12px;
+                position: absolute;
+                top: 8px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 3px 3px 1px 1px;
+                border: 1px solid rgba(0,0,0,0.3);
+            }
+
+            .floor-worker .worker-legs {
+                width: 12px;
+                height: 6px;
+                position: absolute;
+                bottom: 0;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 2px;
+            }
+
+            .floor-worker .worker-leg {
+                flex: 1;
+                background: #2a3a4a;
+                border-radius: 0 0 2px 2px;
+            }
+
+            .floor-worker.walking .worker-leg {
+                animation: workerWalk 0.25s infinite alternate;
+            }
+
+            .floor-worker.walking .worker-leg:nth-child(2) {
+                animation-delay: 0.125s;
+            }
+
+            .floor-worker.network .worker-body { background: var(--staff-network); }
+            .floor-worker.storage .worker-body { background: var(--staff-storage); }
+            .floor-worker.compute .worker-body { background: var(--staff-compute); }
+            .floor-worker.generalist .worker-body { background: var(--staff-generalist); }
+
+            @keyframes workerWalk {
+                0% { height: 6px; transform: translateY(0); }
+                100% { height: 4px; transform: translateY(2px); }
+            }
+
+            /* Equipment being carried by worker */
+            .floor-worker .carried-equipment {
+                position: absolute;
+                top: 4px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 18px;
+                height: 10px;
+                border-radius: 2px;
+                border: 1px solid rgba(0,0,0,0.5);
+                z-index: 1;
+            }
+
+            .floor-worker .carried-equipment.server {
+                background: linear-gradient(180deg, #555 0%, #333 100%);
+            }
+
+            .floor-worker .carried-equipment.server::before {
+                content: '';
+                position: absolute;
+                top: 3px;
+                left: 3px;
+                width: 4px;
+                height: 4px;
+                background: #0f0;
+                border-radius: 50%;
+                box-shadow: 0 0 4px #0f0;
+            }
+
+            .floor-worker .carried-equipment.storage-device {
+                background: linear-gradient(180deg, #666 0%, #444 100%);
+            }
+
+            .floor-worker .carried-equipment.storage-device::before {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 14px;
+                height: 6px;
+                background: repeating-linear-gradient(90deg, #222 0px, #222 2px, #555 2px, #555 4px);
+            }
+
+            .floor-worker .carried-equipment.network-switch {
+                background: linear-gradient(180deg, #4a7a9a 0%, #2a5a7a 100%);
+            }
+
+            .floor-worker .carried-equipment.network-switch::before {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 14px;
+                height: 3px;
+                background: repeating-linear-gradient(90deg, #0af 0px, #0af 2px, transparent 2px, transparent 3px);
+            }
+
+            .floor-worker .carried-equipment.gpu {
+                background: linear-gradient(180deg, #5a5 0%, #383 100%);
+            }
+
+            .floor-worker .carried-equipment.gpu::before {
+                content: '';
+                position: absolute;
+                top: 2px;
+                left: 3px;
+                width: 10px;
+                height: 6px;
+                background: #222;
+                border: 1px solid #5a5;
+            }
+
+            /* Rack interior with equipment slots */
+            .rack-interior {
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
+                padding: 4px;
+                width: 100%;
+                height: 100%;
+            }
+
+            .rack-slot {
+                flex: 1;
+                background: rgba(0,0,0,0.4);
+                border-radius: 2px;
+                min-height: 6px;
+                max-height: 12px;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .rack-slot.filled {
+                background: linear-gradient(180deg, #555 0%, #333 100%);
+                border: 1px solid rgba(255,255,255,0.15);
+            }
+
+            .rack-slot.filled::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 3px;
+                transform: translateY(-50%);
+                width: 3px;
+                height: 3px;
+                background: #0f0;
+                border-radius: 50%;
+                box-shadow: 0 0 3px #0f0;
+                animation: ledBlink 2s infinite;
+            }
+
+            .rack-slot.filled.storage-slot {
+                background: linear-gradient(180deg, #666 0%, #444 100%);
+            }
+
+            .rack-slot.filled.storage-slot::before {
+                background: #f80;
+                box-shadow: 0 0 3px #f80;
+            }
+
+            .rack-slot.filled.network-slot {
+                background: linear-gradient(180deg, #4a7a9a 0%, #2a5a7a 100%);
+            }
+
+            .rack-slot.filled.network-slot::before {
+                background: #0af;
+                box-shadow: 0 0 3px #0af;
+            }
+
+            .rack-slot.filled.gpu-slot {
+                background: linear-gradient(180deg, #5a5 0%, #383 100%);
+            }
+
+            .rack-slot.filled.gpu-slot::before {
+                background: #5f5;
+                box-shadow: 0 0 3px #5f5;
+            }
+
+            .rack-slot.installing {
+                animation: slotSlideIn 0.6s ease-out forwards;
+            }
+
+            .rack-slot.removing {
+                animation: slotSlideOut 0.6s ease-in forwards;
+            }
+
+            @keyframes ledBlink {
+                0%, 92%, 100% { opacity: 1; }
+                96% { opacity: 0.2; }
+            }
+
+            @keyframes slotSlideIn {
+                0% { transform: translateX(-100%); opacity: 0; }
+                100% { transform: translateX(0); opacity: 1; }
+            }
+
+            @keyframes slotSlideOut {
+                0% { transform: translateX(0); opacity: 1; }
+                100% { transform: translateX(100%); opacity: 0; }
+            }
+
+            /* Equipment staging area off-screen */
+            .staging-area {
+                position: absolute;
+                left: -50px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .staging-equipment {
+                width: 30px;
+                height: 10px;
+                background: linear-gradient(180deg, #555 0%, #333 100%);
+                border-radius: 2px;
+                border: 1px solid rgba(255,255,255,0.2);
+            }
+
+            /* Decommission area */
+            .decommission-area {
+                position: absolute;
+                right: -50px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+            }
+
+            /* Hardware Panel */
+            .hardware-panel {
+                background: rgba(20, 30, 50, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 1vh 1vw;
+                flex-shrink: 0;
+                transition: opacity 0.5s, max-height 0.5s;
+            }
+
+            .hardware-panel.hidden {
+                display: none;
+            }
+
+            .hardware-panel h2 {
+                color: var(--accent-blue);
+                margin-bottom: 0.5vh;
+                font-size: clamp(10px, 1.2vw, 14px);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .hardware-panel h2::after {
+                content: '▼';
+                font-size: 10px;
+                transition: transform 0.2s;
+            }
+
+            .hardware-panel.collapsed h2::after {
+                transform: rotate(-90deg);
+            }
+
+            .hardware-panel.collapsed .hardware-content {
+                display: none;
+            }
+
+            .upgrade-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 6px;
+                margin-top: 8px;
+            }
+
+            .upgrade-card {
+                background: rgba(40, 50, 70, 0.6);
+                border: 1px solid var(--grid-line);
+                padding: 6px;
+                font-size: clamp(8px, 0.9vw, 11px);
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+
+            .upgrade-card:hover {
+                border-color: var(--accent-blue);
+            }
+
+            .upgrade-card.purchased {
+                border-color: var(--success);
+                opacity: 0.7;
+            }
+
+            .upgrade-card .cost {
+                color: var(--accent-amber);
+                font-size: clamp(7px, 0.8vw, 10px);
+            }
+
+            /* Story notification bar */
+            .story-bar {
+                background: linear-gradient(90deg, rgba(74, 158, 255, 0.2), transparent);
+                border-left: 3px solid var(--accent-blue);
+                padding: 8px 12px;
+                margin: 8px 0;
+                font-size: clamp(10px, 1.1vw, 13px);
+                font-style: italic;
+                opacity: 0;
+                transform: translateX(-20px);
+                transition: opacity 0.5s, transform 0.5s;
+                display: none;
+            }
+
+            .story-bar.visible {
+                display: block;
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            /* AI/ML team colors */
+            .rack.occupied-ai {
+                background: var(--rack-ai);
+            }
+
+            .request-team.ai {
+                color: #ca8a2a;
+            }
+
+            /* Cloud warning indicator */
+            .cloud-warning {
+                display: none;
+                background: rgba(255, 74, 74, 0.2);
+                border: 1px solid var(--danger);
+                padding: 4px 8px;
+                margin-top: 4px;
+                font-size: clamp(8px, 0.9vw, 11px);
+                color: var(--danger);
+            }
+
+            .cloud-warning.visible {
+                display: block;
+            }
+
+            /* Event notification */
+            .event-notification {
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%) translateY(-100px);
+                background: rgba(20, 30, 50, 0.95);
+                border: 2px solid var(--accent-amber);
+                padding: 15px 25px;
+                z-index: 500;
+                transition: transform 0.3s;
+                max-width: 400px;
+                text-align: center;
+            }
+
+            .event-notification.visible {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .event-notification.positive {
+                border-color: var(--success);
+            }
+
+            .event-notification.negative {
+                border-color: var(--danger);
+            }
+
+            .event-notification h3 {
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+
+            .event-notification p {
+                font-size: 12px;
+                opacity: 0.9;
+            }
+
+            /* Start Game Modal */
+            .start-modal {
+                max-width: 500px;
+            }
+
+            .start-modal h2 {
+                color: var(--accent-blue);
+                margin-bottom: 20px;
+            }
+
+            .campaign-options {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin: 20px 0;
+            }
+
+            .campaign-option {
+                background: rgba(40, 50, 70, 0.8);
+                border: 2px solid var(--grid-line);
+                padding: 15px;
+                cursor: pointer;
+                transition: all 0.2s;
+                text-align: center;
+            }
+
+            .campaign-option:hover {
+                border-color: var(--accent-blue);
+            }
+
+            .campaign-option.selected {
+                border-color: var(--accent-amber);
+            }
+
+            .campaign-option h4 {
+                color: var(--accent-amber);
+                margin-bottom: 5px;
+            }
+
+            .campaign-option p {
+                font-size: 11px;
+                opacity: 0.8;
+            }
+
+            /* Audio controls */
+            .audio-controls {
+                display: flex;
+                gap: 8px;
+                align-items: center;
+            }
+
+            .audio-btn {
+                background: none;
+                border: none;
+                color: var(--text-color);
+                cursor: pointer;
+                font-size: 16px;
+                padding: 4px;
+                opacity: 0.7;
+                transition: opacity 0.2s;
+            }
+
+            .audio-btn:hover {
+                opacity: 1;
+            }
+
+            .audio-btn.muted {
+                opacity: 0.3;
+            }
+
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .game-grid {
+                    grid-template-columns: 1fr;
+                    grid-template-rows: auto 1fr;
+                }
+
+                .sidebar {
+                    order: -1;
+                    max-height: 35vh;
+                    overflow-y: auto;
+                }
+
+                .rack-floor {
+                    grid-template-columns: repeat(3, 1fr);
+                }
+
+                .rack {
+                    min-height: 60px;
+                    touch-action: manipulation;
+                }
+
+                .request-card {
+                    padding: 12px;
+                }
+
+                .btn {
+                    padding: 12px 16px;
+                    min-height: 44px;
+                }
+
+                .controls {
+                    flex-wrap: wrap;
+                }
+
+                header {
+                    flex-direction: column;
+                    gap: 8px;
+                    text-align: center;
+                }
+            }
+
+            @media (max-width: 480px) {
+                .container {
+                    padding: 0.5vh 0.5vw;
+                }
+
+                .rack-floor {
+                    gap: 4px;
+                }
+
+                .staff-roster {
+                    justify-content: center;
+                }
+
+                .upgrade-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .campaign-options {
+                    grid-template-columns: 1fr;
+                }
+            }
         </style>
     </head>
     <body>
+        <!-- Event Notification -->
+        <div class="event-notification" id="eventNotification">
+            <h3 id="eventTitle">Event</h3>
+            <p id="eventText">Something happened!</p>
+        </div>
+
         <div class="container">
             <header>
                 <div class="title">Rack & Ruin</div>
-                <div class="header-right">
+                <div class="header-center">
                     <div class="date-display" id="dateDisplay">January 1, 2015</div>
                     <div class="day-counter" id="dayCounter">Day 1 / 3650</div>
                 </div>
+                <div class="header-right">
+                    <div class="audio-controls">
+                        <button class="audio-btn" id="musicToggle" title="Toggle Music">♪</button>
+                        <button class="audio-btn" id="sfxToggle" title="Toggle Sound Effects">🔊</button>
+                    </div>
+                </div>
             </header>
+
+            <!-- Story Bar -->
+            <div class="story-bar" id="storyBar"></div>
 
             <div class="game-grid">
                 <div class="main-area">
@@ -597,15 +1394,77 @@
                             </div>
                             <span class="satisfaction-value" id="benchmarkValue">60%</span>
                         </div>
+                        <div class="satisfaction-row hidden" id="aiSatisfactionRow">
+                            <span class="satisfaction-label">AI/ML</span>
+                            <div class="satisfaction-bar">
+                                <div class="satisfaction-fill healthy" id="aiFill" style="width: 60%"></div>
+                            </div>
+                            <span class="satisfaction-value" id="aiValue">60%</span>
+                        </div>
                     </div>
 
                     <div class="capacity-panel">
                         <h2>Sysadmin Team</h2>
                         <div class="capacity-info">
-                            <div>Team: 2 people</div>
-                            <div>Used today: <span class="capacity-used" id="capacityUsed">0</span> / 8 racks</div>
+                            <div>Team: <span id="teamSize">2</span> people</div>
+                            <div>Used today: <span class="capacity-used" id="capacityUsed">0</span> / <span id="maxCapacityDisplay">8</span> racks</div>
                             <div>Depro queue: <span id="deproQueue">0</span> racks</div>
                         </div>
+                    </div>
+
+                    <!-- Budget Panel - hidden until Day 91 -->
+                    <div class="budget-panel hidden" id="budgetPanel">
+                        <h2 onclick="togglePanel('budgetPanel')">Budget</h2>
+                        <div class="budget-content">
+                            <div class="budget-bar">
+                                <div class="budget-fill" id="budgetFill" style="width: 100%; background: var(--budget-green);"></div>
+                            </div>
+                            <div class="budget-info">
+                                <div class="budget-row">
+                                    <span>Remaining:</span>
+                                    <span class="budget-amount healthy" id="budgetRemaining">$500,000</span>
+                                </div>
+                                <div class="budget-row">
+                                    <span>Monthly costs:</span>
+                                    <span id="monthlyCosts">$0</span>
+                                </div>
+                                <div class="budget-row">
+                                    <span>Year:</span>
+                                    <span id="budgetYear">2015</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Staff Panel - hidden until Day 91 -->
+                    <div class="staff-panel hidden" id="staffPanel">
+                        <h2 onclick="togglePanel('staffPanel')">Staff</h2>
+                        <div class="staff-content">
+                            <div class="staff-roster" id="staffRoster">
+                                <!-- Staff figures rendered by JS -->
+                            </div>
+                            <div class="staff-hire-buttons" id="staffHireButtons">
+                                <button class="staff-hire-btn network" onclick="hireStaff('network')">+Network $8k/mo</button>
+                                <button class="staff-hire-btn storage" onclick="hireStaff('storage')">+Storage $8k/mo</button>
+                                <button class="staff-hire-btn compute" onclick="hireStaff('compute')">+Compute $8k/mo</button>
+                                <button class="staff-hire-btn generalist" onclick="hireStaff('generalist')">+General $6k/mo</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hardware Panel - hidden until Year 2 -->
+                    <div class="hardware-panel hidden" id="hardwarePanel">
+                        <h2 onclick="togglePanel('hardwarePanel')">Hardware</h2>
+                        <div class="hardware-content">
+                            <div class="upgrade-grid" id="upgradeGrid">
+                                <!-- Upgrades rendered by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cloud Warning -->
+                    <div class="cloud-warning" id="cloudWarning">
+                        ⚠️ <span id="cloudWarningText">Teams considering cloud migration...</span>
                     </div>
                 </div>
             </div>
@@ -640,7 +1499,71 @@
             </div>
         </div>
 
+        <!-- Start Game Modal -->
+        <div class="modal-overlay active" id="startModal">
+            <div class="modal start-modal">
+                <h2>RACK & RUIN</h2>
+                <p>Select your campaign length:</p>
+                <div class="campaign-options">
+                    <div class="campaign-option" data-years="3" onclick="selectCampaign(3)">
+                        <h4>Sprint</h4>
+                        <p>3 years • Intense</p>
+                    </div>
+                    <div class="campaign-option selected" data-years="5" onclick="selectCampaign(5)">
+                        <h4>Standard</h4>
+                        <p>5 years • Balanced</p>
+                    </div>
+                    <div class="campaign-option" data-years="10" onclick="selectCampaign(10)">
+                        <h4>Marathon</h4>
+                        <p>10 years • Epic</p>
+                    </div>
+                    <div class="campaign-option" data-years="custom" onclick="selectCampaign('custom')">
+                        <h4>Custom</h4>
+                        <p>1-15 years</p>
+                    </div>
+                </div>
+                <div id="customYearsInput" style="display: none; margin-bottom: 15px;">
+                    <input type="number" id="customYears" min="1" max="15" value="5" style="width: 60px; padding: 5px; background: var(--bg-color); border: 1px solid var(--grid-line); color: var(--text-color);">
+                    <span> years</span>
+                </div>
+                <button class="btn primary" onclick="startGame()">Begin</button>
+            </div>
+        </div>
+
+        <!-- Cloud Proposal Modal -->
+        <div class="modal-overlay" id="cloudProposalModal">
+            <div class="modal">
+                <h2 style="color: var(--danger);">CLOUD PROPOSAL</h2>
+                <p id="cloudProposalText">A team is formally proposing to migrate to the cloud.</p>
+                <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">Raise their satisfaction above 30% quickly, or they'll leave!</p>
+                <button class="btn primary" onclick="closeCloudProposal()">Understood</button>
+            </div>
+        </div>
+
         <script>
+            // ============================================
+            // GAME CONFIGURATION
+            // ============================================
+            const CONFIG = {
+                START_YEAR: 2015,
+                DAYS_PER_YEAR: 365,
+                BASE_BUDGET: 500000,
+                STAFF_SALARIES: {
+                    network: 8000,
+                    storage: 8000,
+                    compute: 8000,
+                    generalist: 6000
+                },
+                CAPACITY_PER_STAFF: 4,
+                BASE_CAPACITY: 8,
+                AI_TEAM_ARRIVAL_DAY: 2190, // ~2021
+                PROGRESSIVE_REVEAL: {
+                    BUDGET_DAY: 91,
+                    HARDWARE_YEAR: 2,
+                    EVENTS_YEAR: 3
+                }
+            };
+
             // ============================================
             // GAME STATE
             // ============================================
@@ -649,15 +1572,19 @@
                 year: 2015,
                 month: 1,
                 dayOfMonth: 1,
-                totalDays: 3650,
+                totalDays: 1825, // 5 years default
+                campaignYears: 5,
+                gameStarted: false,
 
                 satisfaction: {
                     rd: 60,
                     sales: 60,
                     benchmark: 60,
+                    ai: 60
                 },
 
-                // 15 racks: 3 rows x 5 columns
+                // Start with 9 racks (3x3), expandable to 15+
+                rackCount: 9,
                 racks: Array(15).fill(null),
 
                 // Request queue
@@ -669,20 +1596,65 @@
                 // Selected racks for placement
                 selectedRacks: [],
 
-                // Sysadmin capacity used today (provisioning + deprovisioning)
+                // Sysadmin capacity
                 capacityUsedToday: 0,
                 maxCapacity: 8,
 
-                // Racks pending deprovisioning (array of {rackIndex, team, name})
+                // Racks pending deprovisioning
                 deproQueue: [],
 
                 // Stats
-                jobsCompleted: { rd: 0, sales: 0, benchmark: 0 },
-                jobsMissed: { rd: 0, sales: 0, benchmark: 0 },
+                jobsCompleted: { rd: 0, sales: 0, benchmark: 0, ai: 0 },
+                jobsMissed: { rd: 0, sales: 0, benchmark: 0, ai: 0 },
 
                 // Game state
                 gameOver: false,
                 victory: false,
+
+                // v2.0 Systems
+                // Budget
+                budget: {
+                    current: 500000,
+                    yearly: 500000,
+                    monthlyExpenses: 0
+                },
+
+                // Staff
+                staff: [],
+
+                // Hardware upgrades purchased
+                upgrades: {
+                    rackExpansion: 0,      // 0-2 (each adds 3 racks)
+                    provisioningSpeed: 0,  // 0-2 (each reduces prov time)
+                    capacityBoost: 0,      // 0-2 (each adds +2 capacity)
+                    hardwareGen: 1         // 1-3 (reduces failure chance)
+                },
+
+                // Rack specializations
+                rackSpecializations: Array(15).fill(null), // null, 'gpu', 'storage', 'compute'
+
+                // AI team joined
+                aiTeamJoined: false,
+
+                // Cloud warnings shown
+                cloudWarningsShown: {
+                    rd: { level40: false, level30: false },
+                    sales: { level40: false, level30: false },
+                    benchmark: { level40: false, level30: false },
+                    ai: { level40: false, level30: false }
+                },
+
+                // Story milestones triggered
+                storyMilestones: {},
+
+                // Audio settings
+                audio: {
+                    musicEnabled: true,
+                    sfxEnabled: true
+                },
+
+                // Events that have fired this year
+                eventsThisYear: []
             };
 
             // ============================================
@@ -692,70 +1664,305 @@
             // - Benchmark: ALWAYS requires same row (results invalid otherwise)
             // - R&D: SOMETIMES requires same row (MPI/interconnect tests yes, software validation no)
             // - Sales: NEVER requires adjacency (demos don't need nanosecond latency)
+            // - AI: ALWAYS requires adjacency (GPU interconnect critical)
             const requestTemplates = {
                 rd: [
-                    // Adjacency required - hardware/interconnect testing
-                    { name: 'DDR4 validation cluster', racks: 4, duration: 14, adjacency: true },
-                    { name: '100GbE integration test', racks: 3, duration: 12, adjacency: true },
-                    { name: 'EPYC Naples validation', racks: 5, duration: 21, adjacency: true },
-                    { name: 'InfiniBand fabric test', racks: 4, duration: 10, adjacency: true },
-                    // No adjacency required - software/single-node testing
-                    { name: 'Broadwell-EP firmware update', racks: 3, duration: 21, adjacency: false },
-                    { name: 'NVMe driver validation', racks: 2, duration: 10, adjacency: false },
-                    { name: 'Skylake BIOS testing', racks: 4, duration: 18, adjacency: false },
-                    { name: 'PCIe 4.0 compatibility', racks: 2, duration: 7, adjacency: false },
-                    { name: 'Optane memory testing', racks: 3, duration: 14, adjacency: false },
+                    // Era 1: 2015-2017 (Early Days)
+                    { name: 'DDR4 validation cluster', racks: 4, duration: 14, adjacency: true, era: 1, domain: 'compute' },
+                    { name: '100GbE integration test', racks: 3, duration: 12, adjacency: true, era: 1, domain: 'network' },
+                    { name: 'Broadwell-EP firmware update', racks: 3, duration: 21, adjacency: false, era: 1, domain: 'compute' },
+                    { name: 'NVMe driver validation', racks: 2, duration: 10, adjacency: false, era: 1, domain: 'storage' },
+                    { name: 'Skylake BIOS testing', racks: 4, duration: 18, adjacency: false, era: 1, domain: 'compute' },
+                    // Era 2: 2018-2020 (Growth Phase)
+                    { name: 'EPYC Naples validation', racks: 5, duration: 21, adjacency: true, era: 2, domain: 'compute' },
+                    { name: 'InfiniBand fabric test', racks: 4, duration: 10, adjacency: true, era: 2, domain: 'network' },
+                    { name: 'PCIe 4.0 compatibility', racks: 2, duration: 7, adjacency: false, era: 2, domain: 'compute' },
+                    { name: 'Optane memory testing', racks: 3, duration: 14, adjacency: false, era: 2, domain: 'storage' },
+                    { name: 'Crimson EPYC Rome test', racks: 4, duration: 16, adjacency: true, era: 2, domain: 'compute' },
+                    // Era 3: 2021-2023 (AI Boom)
+                    { name: 'DDR5 validation suite', racks: 4, duration: 14, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'PCIe 5.0 switch testing', racks: 3, duration: 10, adjacency: true, era: 3, domain: 'network' },
+                    { name: 'CXL memory pooling', racks: 5, duration: 21, adjacency: true, era: 3, domain: 'storage' },
+                    // Era 4: 2024+ (Late Game)
+                    { name: 'Emerald H100 validation', racks: 6, duration: 21, adjacency: true, era: 4, domain: 'compute' },
+                    { name: '400GbE fabric testing', racks: 4, duration: 14, adjacency: true, era: 4, domain: 'network' },
                 ],
                 sales: [
-                    // Sales demos never require adjacency
-                    { name: 'ORNL demo', racks: 2, duration: 5, adjacency: false },
-                    { name: 'Stanford AI showcase', racks: 3, duration: 7, adjacency: false },
-                    { name: 'NASA simulation demo', racks: 2, duration: 5, adjacency: false },
-                    { name: 'Nexus Automotive POC', racks: 2, duration: 7, adjacency: false },
-                    { name: 'Stratos Aerospace CFD demo', racks: 3, duration: 5, adjacency: false },
-                    { name: 'MIT research preview', racks: 2, duration: 7, adjacency: false },
-                    { name: 'LANL competitive eval', racks: 3, duration: 10, adjacency: false },
-                    { name: 'Helix Genomics pipeline', racks: 2, duration: 5, adjacency: false },
-                    { name: 'UW-Madison Space Science', racks: 2, duration: 7, adjacency: false },
-                    { name: 'Argonne materials demo', racks: 3, duration: 5, adjacency: false },
+                    // Sales demos never require adjacency - clients across all eras
+                    { name: 'ORNL demo', racks: 2, duration: 5, adjacency: false, era: 1, domain: 'compute' },
+                    { name: 'Stanford AI showcase', racks: 3, duration: 7, adjacency: false, era: 1, domain: 'compute' },
+                    { name: 'NASA simulation demo', racks: 2, duration: 5, adjacency: false, era: 1, domain: 'compute' },
+                    { name: 'Nexus Automotive POC', racks: 2, duration: 7, adjacency: false, era: 2, domain: 'compute' },
+                    { name: 'Stratos Aerospace CFD demo', racks: 3, duration: 5, adjacency: false, era: 2, domain: 'compute' },
+                    { name: 'MIT research preview', racks: 2, duration: 7, adjacency: false, era: 1, domain: 'compute' },
+                    { name: 'LANL competitive eval', racks: 3, duration: 10, adjacency: false, era: 2, domain: 'compute' },
+                    { name: 'Helix Genomics pipeline', racks: 2, duration: 5, adjacency: false, era: 2, domain: 'storage' },
+                    { name: 'Cloudscape migration POC', racks: 4, duration: 10, adjacency: false, era: 3, domain: 'network' },
+                    { name: 'Skybridge hybrid demo', racks: 3, duration: 7, adjacency: false, era: 3, domain: 'network' },
+                    { name: 'FinTech AI trading demo', racks: 4, duration: 7, adjacency: false, era: 4, domain: 'compute' },
                 ],
                 benchmark: [
                     // Benchmarks ALWAYS require adjacency - results invalid otherwise
-                    { name: 'Intel vs AMD comparison', racks: 6, duration: 14, adjacency: true },
-                    { name: 'GPU compute scaling', racks: 4, duration: 10, adjacency: true },
-                    { name: 'Storage throughput test', racks: 5, duration: 12, adjacency: true },
-                    { name: 'Network latency analysis', racks: 4, duration: 7, adjacency: true },
-                    { name: 'Memory bandwidth study', racks: 4, duration: 10, adjacency: true },
-                    { name: 'Power efficiency audit', racks: 6, duration: 14, adjacency: true },
-                    { name: 'MPI scaling benchmark', racks: 5, duration: 10, adjacency: true },
-                    { name: 'LINPACK validation', racks: 6, duration: 7, adjacency: true },
+                    { name: 'Indigo vs Crimson comparison', racks: 6, duration: 14, adjacency: true, era: 1, domain: 'compute' },
+                    { name: 'GPU compute scaling', racks: 4, duration: 10, adjacency: true, era: 1, domain: 'compute' },
+                    { name: 'Storage throughput test', racks: 5, duration: 12, adjacency: true, era: 1, domain: 'storage' },
+                    { name: 'Network latency analysis', racks: 4, duration: 7, adjacency: true, era: 1, domain: 'network' },
+                    { name: 'Memory bandwidth study', racks: 4, duration: 10, adjacency: true, era: 2, domain: 'compute' },
+                    { name: 'Power efficiency audit', racks: 6, duration: 14, adjacency: true, era: 2, domain: 'compute' },
+                    { name: 'MPI scaling benchmark', racks: 5, duration: 10, adjacency: true, era: 2, domain: 'network' },
+                    { name: 'LINPACK validation', racks: 6, duration: 7, adjacency: true, era: 1, domain: 'compute' },
+                    { name: 'MLPerf inference test', racks: 5, duration: 12, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'NVLink bandwidth test', racks: 4, duration: 8, adjacency: true, era: 4, domain: 'network' },
                 ],
+                ai: [
+                    // AI team - GPU heavy, always adjacent, chaotic
+                    { name: 'LLM training cluster', racks: 6, duration: 28, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'GPT fine-tuning run', racks: 4, duration: 14, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'Diffusion model training', racks: 5, duration: 21, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'Embedding generation', racks: 3, duration: 7, adjacency: true, era: 3, domain: 'storage' },
+                    { name: 'Model checkpoint storage', racks: 4, duration: 10, adjacency: false, era: 3, domain: 'storage' },
+                    { name: 'Multi-GPU inference test', racks: 4, duration: 7, adjacency: true, era: 4, domain: 'compute' },
+                    { name: 'AGI research cluster', racks: 8, duration: 35, adjacency: true, era: 4, domain: 'compute' },
+                    { name: 'Vision model training', racks: 5, duration: 18, adjacency: true, era: 3, domain: 'compute' },
+                    { name: 'Reinforcement learning', racks: 4, duration: 14, adjacency: true, era: 4, domain: 'compute' },
+                ]
             };
+
+            // ============================================
+            // HARDWARE UPGRADES
+            // ============================================
+            const upgradeDefinitions = {
+                rackExpansion: [
+                    { name: 'Rack Row 4', cost: 75000, description: '+3 racks (12 total)' },
+                    { name: 'Rack Row 5', cost: 100000, description: '+3 racks (15 total)' }
+                ],
+                provisioningSpeed: [
+                    { name: 'Automation Scripts', cost: 30000, description: 'Faster provisioning' },
+                    { name: 'Infrastructure as Code', cost: 50000, description: 'Instant provisioning' }
+                ],
+                capacityBoost: [
+                    { name: 'Junior Hires', cost: 40000, description: '+2 daily capacity' },
+                    { name: 'Shift Coverage', cost: 60000, description: '+2 daily capacity' }
+                ],
+                hardwareGen: [
+                    { name: 'Gen 2 Hardware', cost: 80000, description: 'Reduced failures' },
+                    { name: 'Gen 3 Hardware', cost: 120000, description: 'Minimal failures' }
+                ]
+            };
+
+            // ============================================
+            // RANDOM EVENTS
+            // ============================================
+            const randomEvents = [
+                // Hardware Events (negative)
+                {
+                    id: 'rack_failure',
+                    title: 'Rack Failure',
+                    text: 'A power supply failed in rack {rack}. Job interrupted.',
+                    type: 'negative',
+                    minYear: 3,
+                    effect: (gs) => {
+                        const occupiedRacks = gs.racks.map((r, i) => r && r.status !== 'deprovisioning' ? i : -1).filter(i => i >= 0);
+                        if (occupiedRacks.length > 0) {
+                            const rackIdx = randomChoice(occupiedRacks);
+                            const job = gs.racks[rackIdx];
+                            if (job) {
+                                adjustSatisfaction(job.team, -10);
+                                return `Rack ${Math.floor(rackIdx/5)+1}-${(rackIdx%5)+1} failed! ${job.name} interrupted. (-10 ${job.team.toUpperCase()})`;
+                            }
+                        }
+                        return 'A spare rack failed. No jobs affected.';
+                    }
+                },
+                {
+                    id: 'cooling_malfunction',
+                    title: 'Cooling Alert',
+                    text: 'HVAC system struggling. All teams anxious.',
+                    type: 'negative',
+                    minYear: 3,
+                    effect: (gs) => {
+                        Object.keys(gs.satisfaction).forEach(team => {
+                            if (team === 'ai' && !gs.aiTeamJoined) return;
+                            adjustSatisfaction(team, -5);
+                        });
+                        return 'Cooling malfunction! All teams -5 satisfaction.';
+                    }
+                },
+                {
+                    id: 'power_spike',
+                    title: 'Power Spike',
+                    text: 'Unexpected power surge. Some equipment reset.',
+                    type: 'negative',
+                    minYear: 3,
+                    effect: (gs) => {
+                        gs.capacityUsedToday = Math.min(gs.maxCapacity, gs.capacityUsedToday + 4);
+                        return 'Power spike! Lost 4 capacity today dealing with resets.';
+                    }
+                },
+                // Opportunities (positive)
+                {
+                    id: 'budget_bonus',
+                    title: 'Budget Surplus',
+                    text: 'Finance found unused funds. Budget increased!',
+                    type: 'positive',
+                    minYear: 1,
+                    effect: (gs) => {
+                        const bonus = 25000 + Math.floor(Math.random() * 25000);
+                        gs.budget.current += bonus;
+                        return `Budget surplus! +$${bonus.toLocaleString()}`;
+                    }
+                },
+                {
+                    id: 'skilled_applicant',
+                    title: 'Talented Applicant',
+                    text: 'A skilled engineer applied! Hire at 50% off first year.',
+                    type: 'positive',
+                    minYear: 1,
+                    effect: (gs) => {
+                        gs.discountedHire = true;
+                        return 'Talented applicant available! Next hire at 50% salary for first year.';
+                    }
+                },
+                {
+                    id: 'hardware_discount',
+                    title: 'Vendor Sale',
+                    text: 'Emerald/Crimson running promotions. Upgrades 30% off this month.',
+                    type: 'positive',
+                    minYear: 2,
+                    effect: (gs) => {
+                        gs.upgradeDiscount = 0.3;
+                        return 'Hardware vendor sale! Upgrades 30% off this month.';
+                    }
+                },
+                // External Crises
+                {
+                    id: 'security_audit',
+                    title: 'Security Audit',
+                    text: 'Compliance requires immediate security review.',
+                    type: 'neutral',
+                    minYear: 2,
+                    effect: (gs) => {
+                        gs.capacityUsedToday = gs.maxCapacity;
+                        return 'Security audit! All capacity used for compliance today.';
+                    }
+                },
+                {
+                    id: 'vendor_delay',
+                    title: 'Supply Chain Issue',
+                    text: 'Hardware shipment delayed. Provisioning slower tomorrow.',
+                    type: 'negative',
+                    minYear: 2,
+                    effect: (gs) => {
+                        gs.nextDayCapacityPenalty = 4;
+                        return 'Vendor delay! -4 capacity tomorrow.';
+                    }
+                },
+                // Tech Milestones
+                {
+                    id: 'ddr4_launch',
+                    title: 'DDR4 Available',
+                    text: 'DDR4 memory modules have arrived. R&D is excited.',
+                    type: 'milestone',
+                    triggerDay: 1,
+                    oneTime: true,
+                    effect: () => 'DDR4 era begins!'
+                },
+                {
+                    id: 'epyc_launch',
+                    title: 'Crimson EPYC Arrives',
+                    text: 'Crimson EPYC processors available. Competition heats up.',
+                    type: 'milestone',
+                    triggerDay: 730, // ~2017
+                    oneTime: true,
+                    effect: () => 'Crimson EPYC processors now available!'
+                },
+                {
+                    id: 'cloud_pressure',
+                    title: 'Cloud Competition',
+                    text: 'Cloudscape and Skybridge gaining market share. Teams watching.',
+                    type: 'milestone',
+                    triggerDay: 1095, // ~2018
+                    oneTime: true,
+                    effect: () => 'Cloud providers growing. Keep teams happy!'
+                },
+                {
+                    id: 'gpu_shortage',
+                    title: 'GPU Shortage',
+                    text: 'Cryptocurrency mining causing GPU shortages worldwide.',
+                    type: 'milestone',
+                    triggerDay: 1460, // ~2019
+                    oneTime: true,
+                    effect: (gs) => {
+                        gs.gpuShortage = true;
+                        return 'GPU shortage! AI team requests may increase.';
+                    }
+                },
+                {
+                    id: 'ai_team_arrives',
+                    title: 'AI Team Formed',
+                    text: 'The AI/ML team has formed. Brace yourself.',
+                    type: 'milestone',
+                    triggerDay: CONFIG.AI_TEAM_ARRIVAL_DAY,
+                    oneTime: true,
+                    effect: (gs) => {
+                        gs.aiTeamJoined = true;
+                        document.getElementById('aiSatisfactionRow').classList.remove('hidden');
+                        return 'AI/ML team has joined! Expect demanding GPU workloads.';
+                    }
+                }
+            ];
+
+            // ============================================
+            // STORY MILESTONES
+            // ============================================
+            const storyMilestones = [
+                { day: 1, text: 'Welcome to 2015. Your datacenter awaits.' },
+                { day: 30, text: 'First month down. The requests keep coming.' },
+                { day: 90, text: 'Q1 complete. Management unlocks the budget panel.' },
+                { day: 180, text: 'Half a year in. You\'re getting the hang of this.' },
+                { day: 365, text: 'One year survived. Hardware upgrades now available.' },
+                { day: 500, text: 'The cloud vendors are circling. Keep teams happy.' },
+                { day: 730, text: 'Year 2 begins. Crimson EPYC shakes up the market.' },
+                { day: 1095, text: 'Year 3. Cloudscape and Skybridge ads everywhere.' },
+                { day: 1460, text: 'Year 4. GPU shortage hits. Crypto miners blamed.' },
+                { day: 1825, text: 'Year 5. If you\'re still here, you\'re doing well.' },
+                { day: 2190, text: 'Year 6. The AI boom begins. LLMs everywhere.' },
+                { day: 2555, text: 'Year 7. Emerald can\'t make GPUs fast enough.' },
+                { day: 2920, text: 'Year 8. Cloud or datacenter? The debate rages.' },
+                { day: 3285, text: 'Year 9. You\'ve seen it all now.' },
+                { day: 3650, text: 'A decade. Legend.' }
+            ];
 
             // ============================================
             // UTILITY FUNCTIONS
             // ============================================
             function formatDate(day) {
-                const startDate = new Date(2015, 0, 1);
+                const startDate = new Date(CONFIG.START_YEAR, 0, 1);
                 const currentDate = new Date(startDate);
                 currentDate.setDate(startDate.getDate() + day - 1);
 
                 const months = [
-                    'January',
-                    'February',
-                    'March',
-                    'April',
-                    'May',
-                    'June',
-                    'July',
-                    'August',
-                    'September',
-                    'October',
-                    'November',
-                    'December',
+                    'January', 'February', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December'
                 ];
 
                 return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
+            }
+
+            function getGameYear() {
+                return Math.floor((gameState.day - 1) / CONFIG.DAYS_PER_YEAR) + 1;
+            }
+
+            function getCalendarYear() {
+                return CONFIG.START_YEAR + getGameYear() - 1;
+            }
+
+            function getCurrentEra() {
+                const year = getCalendarYear();
+                if (year <= 2017) return 1;
+                if (year <= 2020) return 2;
+                if (year <= 2023) return 3;
+                return 4;
             }
 
             function randomInt(min, max) {
@@ -766,6 +1973,410 @@
                 return arr[Math.floor(Math.random() * arr.length)];
             }
 
+            function isNewMonth() {
+                const startDate = new Date(CONFIG.START_YEAR, 0, 1);
+                const currentDate = new Date(startDate);
+                currentDate.setDate(startDate.getDate() + gameState.day - 1);
+                return currentDate.getDate() === 1;
+            }
+
+            function isNewYear() {
+                return gameState.day % CONFIG.DAYS_PER_YEAR === 1 && gameState.day > 1;
+            }
+
+            // ============================================
+            // AUDIO SYSTEM
+            // ============================================
+            const audioContext = {
+                music: null,
+                initialized: false
+            };
+
+            function playSound(type) {
+                if (!gameState.audio.sfxEnabled) return;
+                // Placeholder - actual audio files would be loaded here
+                // Types: 'click', 'place', 'advance', 'alert', 'success', 'event'
+            }
+
+            function toggleMusic() {
+                gameState.audio.musicEnabled = !gameState.audio.musicEnabled;
+                document.getElementById('musicToggle').classList.toggle('muted', !gameState.audio.musicEnabled);
+            }
+
+            function toggleSfx() {
+                gameState.audio.sfxEnabled = !gameState.audio.sfxEnabled;
+                document.getElementById('sfxToggle').classList.toggle('muted', !gameState.audio.sfxEnabled);
+            }
+
+            // ============================================
+            // BUDGET SYSTEM
+            // ============================================
+            function calculateMonthlyExpenses() {
+                let total = 0;
+                gameState.staff.forEach(s => {
+                    total += CONFIG.STAFF_SALARIES[s.specialty];
+                });
+                return total;
+            }
+
+            function processMonthlyBudget() {
+                const expenses = calculateMonthlyExpenses();
+                gameState.budget.monthlyExpenses = expenses;
+                gameState.budget.current -= expenses;
+
+                if (expenses > 0) {
+                    logEvent(`Monthly salaries paid: $${expenses.toLocaleString()}`);
+                }
+
+                // Check for budget crisis
+                if (gameState.budget.current < 0) {
+                    logEvent('BUDGET CRISIS: Cannot afford staff!');
+                    // Fire most expensive staff member
+                    if (gameState.staff.length > 0) {
+                        gameState.staff.sort((a, b) =>
+                            CONFIG.STAFF_SALARIES[b.specialty] - CONFIG.STAFF_SALARIES[a.specialty]
+                        );
+                        const fired = gameState.staff.shift();
+                        logEvent(`${fired.specialty} specialist left (budget cuts)`);
+                        updateMaxCapacity();
+                    }
+                }
+
+                // Clear discounts at month end
+                gameState.upgradeDiscount = 0;
+                gameState.discountedHire = false;
+            }
+
+            function processYearlyBudget() {
+                // New year budget allocation
+                const yearMultiplier = 1 + (getGameYear() - 1) * 0.1; // 10% more each year
+                gameState.budget.yearly = Math.floor(CONFIG.BASE_BUDGET * yearMultiplier);
+                gameState.budget.current += gameState.budget.yearly;
+                logEvent(`New year budget: +$${gameState.budget.yearly.toLocaleString()}`);
+            }
+
+            function getBudgetStatus() {
+                const ratio = gameState.budget.current / gameState.budget.yearly;
+                if (ratio > 0.5) return 'healthy';
+                if (ratio > 0.2) return 'warning';
+                return 'danger';
+            }
+
+            // ============================================
+            // STAFF SYSTEM
+            // ============================================
+            function hireStaff(specialty) {
+                const salary = CONFIG.STAFF_SALARIES[specialty];
+                const cost = gameState.discountedHire ? salary * 6 : salary * 12; // Annual cost consideration
+
+                if (gameState.budget.current < salary * 3) {
+                    logEvent(`Cannot afford ${specialty} specialist`);
+                    return;
+                }
+
+                const newStaff = {
+                    id: Date.now(),
+                    specialty: specialty,
+                    hiredDay: gameState.day
+                };
+
+                gameState.staff.push(newStaff);
+                gameState.discountedHire = false;
+                updateMaxCapacity();
+                logEvent(`Hired ${specialty} specialist ($${salary.toLocaleString()}/mo)`);
+                playSound('success');
+                updateDisplay();
+            }
+
+            function fireStaff(staffId) {
+                const idx = gameState.staff.findIndex(s => s.id === staffId);
+                if (idx >= 0) {
+                    const staff = gameState.staff[idx];
+                    gameState.staff.splice(idx, 1);
+                    updateMaxCapacity();
+                    logEvent(`${staff.specialty} specialist departed`);
+                    updateDisplay();
+                }
+            }
+
+            function updateMaxCapacity() {
+                let capacity = CONFIG.BASE_CAPACITY;
+
+                // Staff bonuses
+                gameState.staff.forEach(s => {
+                    capacity += CONFIG.CAPACITY_PER_STAFF;
+                });
+
+                // Upgrade bonuses
+                capacity += gameState.upgrades.capacityBoost * 2;
+
+                gameState.maxCapacity = capacity;
+            }
+
+            function getStaffCapacityBonus(domain) {
+                // Specialists provide bonus for matching domain jobs
+                let bonus = 0;
+                gameState.staff.forEach(s => {
+                    if (s.specialty === domain) bonus += 2;
+                    if (s.specialty === 'generalist') bonus += 1;
+                });
+                return bonus;
+            }
+
+            // ============================================
+            // HARDWARE UPGRADE SYSTEM
+            // ============================================
+            function purchaseUpgrade(upgradeType) {
+                const level = gameState.upgrades[upgradeType];
+                const upgrades = upgradeDefinitions[upgradeType];
+
+                if (level >= upgrades.length) return;
+
+                let cost = upgrades[level].cost;
+                if (gameState.upgradeDiscount) {
+                    cost = Math.floor(cost * (1 - gameState.upgradeDiscount));
+                }
+
+                if (gameState.budget.current < cost) {
+                    logEvent(`Cannot afford ${upgrades[level].name}`);
+                    return;
+                }
+
+                gameState.budget.current -= cost;
+                gameState.upgrades[upgradeType]++;
+
+                // Apply upgrade effects
+                if (upgradeType === 'rackExpansion') {
+                    gameState.rackCount = 9 + (gameState.upgrades.rackExpansion * 3);
+                }
+
+                updateMaxCapacity();
+                logEvent(`Purchased: ${upgrades[level].name} (-$${cost.toLocaleString()})`);
+                playSound('success');
+                updateDisplay();
+            }
+
+            function specializeRack(rackIndex, specialization) {
+                if (gameState.racks[rackIndex] !== null) {
+                    logEvent('Cannot specialize occupied rack');
+                    return;
+                }
+                gameState.rackSpecializations[rackIndex] = specialization;
+                logEvent(`Rack ${Math.floor(rackIndex/5)+1}-${(rackIndex%5)+1} specialized: ${specialization || 'general'}`);
+                updateDisplay();
+            }
+
+            // ============================================
+            // RANDOM EVENTS SYSTEM
+            // ============================================
+            function checkRandomEvents() {
+                const gameYear = getGameYear();
+
+                // Milestone events (one-time, triggered by day)
+                randomEvents.filter(e => e.oneTime && e.triggerDay === gameState.day).forEach(event => {
+                    if (!gameState.storyMilestones[event.id]) {
+                        triggerEvent(event);
+                        gameState.storyMilestones[event.id] = true;
+                    }
+                });
+
+                // Random events (Year 3+, ~1 per month)
+                if (gameYear >= CONFIG.PROGRESSIVE_REVEAL.EVENTS_YEAR) {
+                    const dayOfMonth = gameState.day % 30;
+                    if (dayOfMonth === 15 && Math.random() < 0.4) {
+                        const eligibleEvents = randomEvents.filter(e =>
+                            !e.oneTime &&
+                            (!e.minYear || gameYear >= e.minYear) &&
+                            !gameState.eventsThisYear.includes(e.id)
+                        );
+
+                        if (eligibleEvents.length > 0) {
+                            const event = randomChoice(eligibleEvents);
+                            triggerEvent(event);
+                            gameState.eventsThisYear.push(event.id);
+                        }
+                    }
+                }
+
+                // Reset yearly event tracking
+                if (isNewYear()) {
+                    gameState.eventsThisYear = [];
+                }
+            }
+
+            function triggerEvent(event) {
+                const result = event.effect(gameState);
+                showEventNotification(event.title, result || event.text, event.type);
+                logEvent(`EVENT: ${result || event.text}`);
+                playSound('event');
+            }
+
+            function showEventNotification(title, text, type) {
+                const notification = document.getElementById('eventNotification');
+                document.getElementById('eventTitle').textContent = title;
+                document.getElementById('eventText').textContent = text;
+
+                notification.className = 'event-notification visible';
+                if (type === 'positive') notification.classList.add('positive');
+                if (type === 'negative') notification.classList.add('negative');
+
+                setTimeout(() => {
+                    notification.classList.remove('visible');
+                }, 4000);
+            }
+
+            // ============================================
+            // CLOUD PRESSURE SYSTEM
+            // ============================================
+            function checkCloudPressure() {
+                const teams = gameState.aiTeamJoined ?
+                    ['rd', 'sales', 'benchmark', 'ai'] :
+                    ['rd', 'sales', 'benchmark'];
+
+                let showWarning = false;
+                let warningTeams = [];
+
+                teams.forEach(team => {
+                    const sat = gameState.satisfaction[team];
+
+                    // Level 40 warning
+                    if (sat < 40 && sat >= 30 && !gameState.cloudWarningsShown[team].level40) {
+                        logEvent(`${team.toUpperCase()} is considering cloud alternatives...`);
+                        gameState.cloudWarningsShown[team].level40 = true;
+                        showWarning = true;
+                        warningTeams.push(team);
+                    }
+
+                    // Level 30 formal proposal
+                    if (sat < 30 && sat >= 20 && !gameState.cloudWarningsShown[team].level30) {
+                        showCloudProposal(team);
+                        gameState.cloudWarningsShown[team].level30 = true;
+                    }
+
+                    // Reset warnings if satisfaction recovered
+                    if (sat >= 40) {
+                        gameState.cloudWarningsShown[team].level40 = false;
+                    }
+                    if (sat >= 30) {
+                        gameState.cloudWarningsShown[team].level30 = false;
+                    }
+
+                    if (sat < 40) {
+                        showWarning = true;
+                        if (!warningTeams.includes(team)) warningTeams.push(team);
+                    }
+                });
+
+                // Update cloud warning UI
+                const warningEl = document.getElementById('cloudWarning');
+                if (showWarning) {
+                    warningEl.classList.add('visible');
+                    document.getElementById('cloudWarningText').textContent =
+                        `${warningTeams.map(t => t.toUpperCase()).join(', ')} eyeing cloud migration...`;
+                } else {
+                    warningEl.classList.remove('visible');
+                }
+            }
+
+            function showCloudProposal(team) {
+                const teamNames = { rd: 'R&D', sales: 'Sales', benchmark: 'Benchmark', ai: 'AI/ML' };
+                document.getElementById('cloudProposalText').textContent =
+                    `${teamNames[team]} has formally proposed migrating their workloads to cloud providers.`;
+                document.getElementById('cloudProposalModal').classList.add('active');
+                playSound('alert');
+            }
+
+            function closeCloudProposal() {
+                document.getElementById('cloudProposalModal').classList.remove('active');
+            }
+
+            // ============================================
+            // STORY SYSTEM
+            // ============================================
+            function checkStoryMilestones() {
+                const milestone = storyMilestones.find(m =>
+                    m.day === gameState.day && !gameState.storyMilestones[`story_${m.day}`]
+                );
+
+                if (milestone) {
+                    showStoryBar(milestone.text);
+                    gameState.storyMilestones[`story_${milestone.day}`] = true;
+                }
+            }
+
+            function showStoryBar(text) {
+                const bar = document.getElementById('storyBar');
+                bar.textContent = text;
+                bar.classList.add('visible');
+
+                setTimeout(() => {
+                    bar.classList.remove('visible');
+                }, 6000);
+            }
+
+            // ============================================
+            // PROGRESSIVE UI REVEAL
+            // ============================================
+            function updateProgressiveReveal() {
+                const day = gameState.day;
+                const year = getGameYear();
+
+                // Budget panel (Day 91+)
+                if (day >= CONFIG.PROGRESSIVE_REVEAL.BUDGET_DAY) {
+                    document.getElementById('budgetPanel').classList.remove('hidden');
+                    document.getElementById('staffPanel').classList.remove('hidden');
+                }
+
+                // Hardware panel (Year 2+)
+                if (year >= CONFIG.PROGRESSIVE_REVEAL.HARDWARE_YEAR) {
+                    document.getElementById('hardwarePanel').classList.remove('hidden');
+                }
+            }
+
+            // ============================================
+            // CAMPAIGN SELECTION
+            // ============================================
+            let selectedCampaignYears = 5;
+
+            function selectCampaign(years) {
+                document.querySelectorAll('.campaign-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+
+                if (years === 'custom') {
+                    document.querySelector('[data-years="custom"]').classList.add('selected');
+                    document.getElementById('customYearsInput').style.display = 'block';
+                    selectedCampaignYears = parseInt(document.getElementById('customYears').value) || 5;
+                } else {
+                    document.querySelector(`[data-years="${years}"]`).classList.add('selected');
+                    document.getElementById('customYearsInput').style.display = 'none';
+                    selectedCampaignYears = years;
+                }
+            }
+
+            function startGame() {
+                if (document.querySelector('[data-years="custom"]').classList.contains('selected')) {
+                    selectedCampaignYears = parseInt(document.getElementById('customYears').value) || 5;
+                    selectedCampaignYears = Math.max(1, Math.min(15, selectedCampaignYears));
+                }
+
+                gameState.campaignYears = selectedCampaignYears;
+                gameState.totalDays = selectedCampaignYears * CONFIG.DAYS_PER_YEAR;
+                gameState.gameStarted = true;
+
+                document.getElementById('startModal').classList.remove('active');
+                document.getElementById('dayCounter').textContent = `Day 1 / ${gameState.totalDays}`;
+
+                init();
+            }
+
+            // ============================================
+            // PANEL TOGGLE
+            // ============================================
+            function togglePanel(panelId) {
+                document.getElementById(panelId).classList.toggle('collapsed');
+            }
+
             // ============================================
             // RACK FUNCTIONS
             // ============================================
@@ -773,12 +2384,32 @@
                 return Math.floor(index / 5);
             }
 
+            function getRackColumns() {
+                // Dynamic based on rack count
+                if (gameState.rackCount <= 9) return 3;
+                if (gameState.rackCount <= 12) return 4;
+                return 5;
+            }
+
+            function isRackAvailable(index) {
+                return index < gameState.rackCount && gameState.racks[index] === null;
+            }
+
             // ============================================
             // REQUEST FUNCTIONS
             // ============================================
             function generateRequest() {
-                const teams = ['rd', 'sales', 'benchmark'];
-                const weights = [0.4, 0.35, 0.25];
+                const era = getCurrentEra();
+
+                // Team selection with AI team if joined
+                let teams, weights;
+                if (gameState.aiTeamJoined) {
+                    teams = ['rd', 'sales', 'benchmark', 'ai'];
+                    weights = [0.3, 0.25, 0.2, 0.25]; // AI team is demanding
+                } else {
+                    teams = ['rd', 'sales', 'benchmark'];
+                    weights = [0.4, 0.35, 0.25];
+                }
 
                 let r = Math.random();
                 let team;
@@ -791,38 +2422,54 @@
                 }
                 team = team || 'rd';
 
-                const template = randomChoice(requestTemplates[team]);
-                const deadline = randomInt(2, 7);
-                const isUrgent = deadline <= 3 && Math.random() < 0.4;
+                // Filter templates by era (can use templates from current or earlier eras)
+                const availableTemplates = requestTemplates[team].filter(t => !t.era || t.era <= era);
+                const template = randomChoice(availableTemplates);
+
+                // AI team gets tighter deadlines and more chaotic behavior
+                let deadline = team === 'ai' ? randomInt(2, 5) : randomInt(2, 7);
+                const isUrgent = deadline <= 3 && Math.random() < (team === 'ai' ? 0.6 : 0.4);
+
+                // AI team sometimes changes specs mid-request (chaotic personality)
+                const chaotic = team === 'ai' && Math.random() < 0.3;
 
                 return {
                     id: Date.now() + Math.random(),
                     team: team,
                     name: template.name,
-                    racks: template.racks,
+                    racks: chaotic ? template.racks + randomInt(-1, 2) : template.racks,
                     duration: template.duration,
                     adjacency: template.adjacency,
+                    domain: template.domain || 'compute',
                     deadline: deadline,
                     daysWaiting: 0,
                     isUrgent: isUrgent,
-                    provisioning: 0, // Days left in provisioning
+                    provisioning: 0,
+                    chaotic: chaotic
                 };
             }
 
             function shouldGenerateRequest() {
                 // Base chance, modified by current queue size
-                // Higher base = more frequent requests
                 const baseChance = 0.55;
                 const queueModifier = Math.max(0.2, 1 - gameState.requests.length * 0.12);
-                return Math.random() < baseChance * queueModifier;
+
+                // AI team adds more pressure
+                const aiPressure = gameState.aiTeamJoined ? 1.15 : 1;
+
+                return Math.random() < baseChance * queueModifier * aiPressure;
             }
 
             // ============================================
             // SATISFACTION FUNCTIONS
             // ============================================
             function adjustSatisfaction(team, amount) {
+                // AI team is not tracked until they join
+                if (team === 'ai' && !gameState.aiTeamJoined) return;
+
                 gameState.satisfaction[team] = Math.max(0, Math.min(100, gameState.satisfaction[team] + amount));
                 updateSatisfactionDisplay();
+                checkCloudPressure();
                 checkGameOver();
             }
 
@@ -837,19 +2484,31 @@
             // ============================================
             function areRacksSameRow(indices) {
                 if (indices.length <= 1) return true;
-                const rows = indices.map((i) => getRackRow(i));
+                const cols = getRackColumns();
+                const rows = indices.map((i) => Math.floor(i / cols));
                 return new Set(rows).size === 1;
             }
 
             function canPlaceJob(request, rackIndices) {
-                // Jobs larger than a row (>5) must span rows - always allowed
-                if (request.racks > 5) return { allowed: true, penalty: 0 };
+                const cols = getRackColumns();
+                // Jobs larger than a row must span rows - always allowed
+                if (request.racks > cols) return { allowed: true, penalty: 0 };
 
                 // Jobs that fit in one row
                 const sameRow = areRacksSameRow(rackIndices);
 
                 if (sameRow) {
-                    return { allowed: true, penalty: 0 };
+                    // Check for rack specialization bonus
+                    let bonus = 0;
+                    rackIndices.forEach(idx => {
+                        const spec = gameState.rackSpecializations[idx];
+                        if (spec && request.domain) {
+                            if (spec === 'gpu' && request.domain === 'compute') bonus += 1;
+                            if (spec === 'storage' && request.domain === 'storage') bonus += 1;
+                            if (spec === 'compute' && request.domain === 'compute') bonus += 1;
+                        }
+                    });
+                    return { allowed: true, penalty: 0, bonus: bonus };
                 }
 
                 // Cross-row placement for jobs that could fit in one row
@@ -863,6 +2522,9 @@
                     case 'benchmark':
                         // Benchmark results would be invalid
                         return { allowed: false, reason: 'Benchmark requires same-row for valid results' };
+                    case 'ai':
+                        // AI team needs GPU interconnect
+                        return { allowed: false, reason: 'AI workloads require same-row for GPU interconnect' };
                     default:
                         return { allowed: true, penalty: 0 };
                 }
@@ -876,12 +2538,16 @@
                     return false;
                 }
 
+                // Calculate provisioning time (reduced by upgrades)
+                const provTime = Math.max(0, 1 - gameState.upgrades.provisioningSpeed);
+
                 const job = {
                     id: request.id,
                     team: request.team,
                     name: request.name,
+                    domain: request.domain,
                     daysRemaining: request.duration,
-                    provisioning: 1, // 1 day provisioning
+                    provisioning: provTime,
                     rackIndices: rackIndices,
                 };
 
@@ -897,16 +2563,25 @@
                 // Apply any penalty for suboptimal placement
                 if (placement.penalty) {
                     logEvent(
-                        `${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`,
+                        `${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`
                     );
                     adjustSatisfaction(request.team, placement.penalty);
                 } else {
-                    logEvent(`${request.name} placed successfully`);
+                    let msg = `${request.name} placed successfully`;
+                    if (placement.bonus) {
+                        msg += ` (+${placement.bonus} specialization bonus)`;
+                        adjustSatisfaction(request.team, placement.bonus);
+                    }
+                    logEvent(msg);
                 }
 
                 gameState.selectedRequest = null;
                 gameState.selectedRacks = [];
 
+                // Animate workers installing equipment
+                queueEquipmentInstall(rackIndices, request.domain || 'compute');
+
+                playSound('place');
                 updateDisplay();
                 return true;
             }
@@ -915,11 +2590,33 @@
                 if (gameState.gameOver || gameState.victory) return;
 
                 gameState.day++;
-                gameState.capacityUsedToday = 0;
+
+                // Apply any capacity penalty from previous day's events
+                gameState.capacityUsedToday = gameState.nextDayCapacityPenalty || 0;
+                gameState.nextDayCapacityPenalty = 0;
+
+                // Check for hardware failures (based on hardware generation)
+                if (getGameYear() >= 3) {
+                    const failureChance = [0.02, 0.01, 0.005][gameState.upgrades.hardwareGen - 1] || 0.02;
+                    if (Math.random() < failureChance) {
+                        const occupiedRacks = gameState.racks.map((r, i) =>
+                            r && r.status !== 'deprovisioning' ? i : -1
+                        ).filter(i => i >= 0);
+                        if (occupiedRacks.length > 0 && Math.random() < 0.3) {
+                            // Hardware failure event
+                            const rackIdx = randomChoice(occupiedRacks);
+                            const job = gameState.racks[rackIdx];
+                            if (job && job.team) {
+                                adjustSatisfaction(job.team, -5);
+                                logEvent(`Minor hardware issue in rack ${Math.floor(rackIdx/5)+1}-${(rackIdx%5)+1}`);
+                            }
+                        }
+                    }
+                }
 
                 // Process deprovisioning first (uses sysadmin capacity)
                 const deproToProcess = [];
-                const capacityForDepro = Math.min(gameState.deproQueue.length, gameState.maxCapacity);
+                const capacityForDepro = Math.min(gameState.deproQueue.length, gameState.maxCapacity - gameState.capacityUsedToday);
 
                 for (let i = 0; i < capacityForDepro; i++) {
                     const depro = gameState.deproQueue.shift();
@@ -937,7 +2634,7 @@
                 if (deproToProcess.length > 0) {
                     const rackCount = deproToProcess.length;
                     logEvent(
-                        `Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`,
+                        `Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`
                     );
                 }
 
@@ -977,22 +2674,38 @@
                             });
                         });
                         gameState.jobsCompleted[job.team]++;
-                        adjustSatisfaction(job.team, 5);
+
+                        // Completion bonus (AI team gives more)
+                        const bonus = job.team === 'ai' ? 7 : 5;
+                        adjustSatisfaction(job.team, bonus);
                         logEvent(
-                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+5 ${job.team.toUpperCase()})`,
+                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+${bonus} ${job.team.toUpperCase()})`
                         );
+                        playSound('success');
                     }
                 });
 
                 // Process request deadlines
                 gameState.requests.forEach((request) => {
                     request.daysWaiting++;
+
+                    // AI team chaotic behavior - may change requirements mid-wait
+                    if (request.chaotic && request.daysWaiting === 2 && Math.random() < 0.4) {
+                        const change = randomInt(-1, 2);
+                        if (change !== 0) {
+                            request.racks = Math.max(2, request.racks + change);
+                            logEvent(`AI team changed ${request.name} requirements: now ${request.racks} racks`);
+                        }
+                    }
+
                     if (request.daysWaiting >= request.deadline) {
-                        // Missed deadline - bigger penalties
+                        // Missed deadline - bigger penalties (AI team is harsher)
                         gameState.jobsMissed[request.team]++;
-                        const penalty = request.isUrgent ? -20 : -12;
+                        let penalty = request.isUrgent ? -20 : -12;
+                        if (request.team === 'ai') penalty = Math.floor(penalty * 1.3);
                         adjustSatisfaction(request.team, penalty);
                         logEvent(`MISSED: ${request.name} deadline expired (${penalty} ${request.team.toUpperCase()})`);
+                        playSound('alert');
                     }
                 });
 
@@ -1006,12 +2719,32 @@
                     logEvent(`New request: ${newRequest.name} (${newRequest.team.toUpperCase()})`);
                 }
 
+                // Monthly processing
+                if (isNewMonth()) {
+                    processMonthlyBudget();
+                }
+
+                // Yearly processing
+                if (isNewYear()) {
+                    processYearlyBudget();
+                }
+
+                // Check random events
+                checkRandomEvents();
+
+                // Check story milestones
+                checkStoryMilestones();
+
+                // Update progressive reveal
+                updateProgressiveReveal();
+
                 // Check victory
                 if (gameState.day >= gameState.totalDays) {
                     gameState.victory = true;
                     showVictory();
                 }
 
+                playSound('advance');
                 updateDisplay();
             }
 
@@ -1025,44 +2758,274 @@
             }
 
             // ============================================
+            // WORKER ANIMATION SYSTEM
+            // ============================================
+            const workerState = {
+                workers: [],
+                animations: [],
+                nextWorkerId: 1
+            };
+
+            function createFloorWorker(specialty) {
+                const worker = {
+                    id: workerState.nextWorkerId++,
+                    specialty: specialty,
+                    x: -30,
+                    y: 100,
+                    carrying: null,
+                    busy: false,
+                    element: null
+                };
+
+                const el = document.createElement('div');
+                el.className = `floor-worker ${specialty}`;
+                el.id = `worker-${worker.id}`;
+                el.innerHTML = `
+                    <div class="worker-head"></div>
+                    <div class="worker-body"></div>
+                    <div class="worker-legs">
+                        <div class="worker-leg"></div>
+                        <div class="worker-leg"></div>
+                    </div>
+                `;
+                el.style.left = `${worker.x}px`;
+                el.style.top = `${worker.y}px`;
+
+                const datacenter = document.querySelector('.datacenter');
+                if (datacenter) {
+                    datacenter.appendChild(el);
+                }
+
+                worker.element = el;
+                workerState.workers.push(worker);
+                return worker;
+            }
+
+            function getAvailableWorker() {
+                // First try to find a non-busy worker
+                let worker = workerState.workers.find(w => !w.busy);
+                if (worker) return worker;
+
+                // If no workers exist yet or all are busy, create a generalist
+                if (workerState.workers.length < 4) {
+                    const specialties = ['compute', 'network', 'storage', 'generalist'];
+                    return createFloorWorker(specialties[workerState.workers.length % specialties.length]);
+                }
+
+                return null;
+            }
+
+            function getRackPosition(rackIndex) {
+                const floor = document.getElementById('rackFloor');
+                const racks = floor.querySelectorAll('.rack[data-index]');
+                const rack = Array.from(racks).find(r => r.dataset.index == rackIndex);
+
+                if (rack) {
+                    const floorRect = floor.getBoundingClientRect();
+                    const rackRect = rack.getBoundingClientRect();
+                    return {
+                        x: rackRect.left - floorRect.left + rackRect.width / 2 - 10,
+                        y: rackRect.top - floorRect.top + rackRect.height / 2 - 14
+                    };
+                }
+                return { x: 100, y: 100 };
+            }
+
+            function animateWorkerToRack(worker, rackIndex, equipmentType, onArrive) {
+                if (!worker || !worker.element) return;
+
+                worker.busy = true;
+                worker.carrying = equipmentType;
+                worker.element.classList.add('walking');
+
+                // Add equipment to worker
+                if (equipmentType) {
+                    const equipEl = document.createElement('div');
+                    equipEl.className = `carried-equipment ${equipmentType}`;
+                    worker.element.appendChild(equipEl);
+                }
+
+                const pos = getRackPosition(rackIndex);
+
+                // Animate to rack
+                worker.element.style.left = `${pos.x}px`;
+                worker.element.style.top = `${pos.y}px`;
+
+                setTimeout(() => {
+                    worker.element.classList.remove('walking');
+
+                    // Remove carried equipment
+                    const carried = worker.element.querySelector('.carried-equipment');
+                    if (carried) carried.remove();
+
+                    if (onArrive) onArrive();
+
+                    // Return worker to staging area after a moment
+                    setTimeout(() => {
+                        animateWorkerToStaging(worker);
+                    }, 500);
+                }, 1300);
+            }
+
+            function animateWorkerToStaging(worker) {
+                if (!worker || !worker.element) return;
+
+                worker.element.classList.add('walking');
+                worker.element.style.left = '-30px';
+                worker.element.style.top = `${50 + workerState.workers.indexOf(worker) * 40}px`;
+
+                setTimeout(() => {
+                    worker.element.classList.remove('walking');
+                    worker.busy = false;
+                    worker.carrying = null;
+                }, 1300);
+            }
+
+            function queueEquipmentInstall(rackIndices, domain) {
+                const equipmentTypes = {
+                    'compute': 'server',
+                    'storage': 'storage-device',
+                    'network': 'network-switch',
+                    'gpu': 'gpu'
+                };
+                const equipType = equipmentTypes[domain] || 'server';
+
+                rackIndices.forEach((rackIdx, i) => {
+                    setTimeout(() => {
+                        const worker = getAvailableWorker();
+                        if (worker) {
+                            animateWorkerToRack(worker, rackIdx, equipType, () => {
+                                // Trigger slot fill animation
+                                const rack = document.querySelector(`.rack[data-index="${rackIdx}"]`);
+                                if (rack) {
+                                    const slots = rack.querySelectorAll('.rack-slot:not(.filled)');
+                                    if (slots.length > 0) {
+                                        slots[0].classList.add('filled', 'installing');
+                                        setTimeout(() => slots[0].classList.remove('installing'), 600);
+                                    }
+                                }
+                            });
+                        }
+                    }, i * 400);
+                });
+            }
+
+            function queueEquipmentRemoval(rackIndices) {
+                rackIndices.forEach((rackIdx, i) => {
+                    setTimeout(() => {
+                        const worker = getAvailableWorker();
+                        if (worker) {
+                            animateWorkerToRack(worker, rackIdx, null, () => {
+                                // Trigger slot removal animation
+                                const rack = document.querySelector(`.rack[data-index="${rackIdx}"]`);
+                                if (rack) {
+                                    const slots = rack.querySelectorAll('.rack-slot.filled');
+                                    if (slots.length > 0) {
+                                        const slot = slots[slots.length - 1];
+                                        slot.classList.add('removing');
+                                        setTimeout(() => slot.classList.remove('filled', 'removing'), 600);
+                                    }
+                                }
+                            });
+                        }
+                    }, i * 400);
+                });
+            }
+
+            // ============================================
             // UI FUNCTIONS
             // ============================================
             function renderRacks() {
                 const floor = document.getElementById('rackFloor');
                 floor.innerHTML = '';
 
-                for (let row = 0; row < 3; row++) {
+                const cols = getRackColumns();
+                const rows = Math.ceil(gameState.rackCount / cols);
+
+                // Update grid columns
+                floor.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+
+                for (let row = 0; row < rows; row++) {
                     const rowLabel = document.createElement('div');
                     rowLabel.className = 'row-label';
                     rowLabel.textContent = `Row ${row + 1}`;
                     floor.appendChild(rowLabel);
 
-                    for (let col = 0; col < 5; col++) {
-                        const idx = row * 5 + col;
+                    for (let col = 0; col < cols; col++) {
+                        const idx = row * cols + col;
+
+                        // Skip racks beyond current capacity
+                        if (idx >= gameState.rackCount) {
+                            const placeholder = document.createElement('div');
+                            placeholder.className = 'rack';
+                            placeholder.style.opacity = '0.2';
+                            placeholder.style.cursor = 'not-allowed';
+                            placeholder.innerHTML = `<div class="rack-label" style="opacity:0.3">--</div>`;
+                            floor.appendChild(placeholder);
+                            continue;
+                        }
+
                         const rack = document.createElement('div');
                         rack.className = 'rack';
                         rack.dataset.index = idx;
+
+                        // Show specialization
+                        const spec = gameState.rackSpecializations[idx];
+                        if (spec) {
+                            rack.style.borderBottomColor = spec === 'gpu' ? '#e74c3c' :
+                                spec === 'storage' ? '#9b59b6' : '#3498db';
+                            rack.style.borderBottomWidth = '3px';
+                        }
 
                         const job = gameState.racks[idx];
                         if (job) {
                             if (job.status === 'deprovisioning') {
                                 rack.classList.add('deprovisioning');
+                                // Show equipment being removed
+                                const slotClass = getSlotClass(job.domain || 'compute');
                                 rack.innerHTML = `
-                                <div class="rack-job">Cleanup</div>
-                                <div class="rack-days">Queued</div>
-                            `;
+                                    <div class="rack-interior">
+                                        <div class="rack-slot filled ${slotClass} removing"></div>
+                                        <div class="rack-slot filled ${slotClass} removing"></div>
+                                        <div class="rack-slot"></div>
+                                        <div class="rack-slot"></div>
+                                    </div>
+                                `;
                             } else {
                                 rack.classList.add(`occupied-${job.team}`);
                                 if (job.provisioning > 0) {
                                     rack.classList.add('provisioning');
                                 }
+                                // Show equipment in rack
+                                const slotClass = getSlotClass(job.domain || 'compute');
+                                const filledSlots = job.provisioning > 0 ? 2 : 4;
+                                let slotsHtml = '';
+                                for (let s = 0; s < 4; s++) {
+                                    if (s < filledSlots) {
+                                        slotsHtml += `<div class="rack-slot filled ${slotClass}"></div>`;
+                                    } else {
+                                        slotsHtml += `<div class="rack-slot"></div>`;
+                                    }
+                                }
                                 rack.innerHTML = `
-                                <div class="rack-job">${job.name}</div>
-                                <div class="rack-days">${job.provisioning > 0 ? 'Provisioning...' : job.daysRemaining + 'd left'}</div>
-                            `;
+                                    <div class="rack-interior">
+                                        ${slotsHtml}
+                                    </div>
+                                    <div class="rack-job" style="position:absolute;bottom:2px;left:2px;right:2px;font-size:8px;text-align:center;">${job.provisioning > 0 ? 'Installing...' : job.daysRemaining + 'd'}</div>
+                                `;
                             }
                         } else {
-                            rack.innerHTML = `<div class="rack-label">${row + 1}-${col + 1}</div>`;
+                            // Empty rack shows empty slots
+                            const specLabel = spec ? ` [${spec.charAt(0).toUpperCase()}]` : '';
+                            rack.innerHTML = `
+                                <div class="rack-interior">
+                                    <div class="rack-slot"></div>
+                                    <div class="rack-slot"></div>
+                                    <div class="rack-slot"></div>
+                                    <div class="rack-slot"></div>
+                                </div>
+                                <div class="rack-label" style="position:absolute;bottom:2px;font-size:9px;">${row + 1}-${col + 1}${specLabel}</div>
+                            `;
                         }
 
                         if (gameState.selectedRacks.includes(idx)) {
@@ -1075,8 +3038,18 @@
                 }
             }
 
+            function getSlotClass(domain) {
+                switch(domain) {
+                    case 'storage': return 'storage-slot';
+                    case 'network': return 'network-slot';
+                    case 'gpu': return 'gpu-slot';
+                    default: return '';
+                }
+            }
+
             function renderRequests() {
                 const queue = document.getElementById('requestQueue');
+                const cols = getRackColumns();
 
                 if (gameState.requests.length === 0) {
                     queue.innerHTML = '<div style="opacity: 0.5; font-size: 12px;">No pending requests</div>';
@@ -1086,22 +3059,27 @@
                 queue.innerHTML = gameState.requests
                     .map((req) => {
                         // Show warning if job must be same-row
-                        const sameRowNote =
-                            req.racks <= 5 && req.team !== 'rd'
-                                ? '<br><span class="request-adjacency">Same row required</span>'
-                                : req.racks <= 5 && req.team === 'rd'
-                                  ? '<br><span class="request-adjacency">Same row preferred</span>'
-                                  : '';
+                        let sameRowNote = '';
+                        if (req.racks <= cols) {
+                            if (req.team === 'ai' || req.team === 'benchmark') {
+                                sameRowNote = '<br><span class="request-adjacency">Same row required</span>';
+                            } else if (req.team === 'sales') {
+                                sameRowNote = '<br><span class="request-adjacency">Same row required</span>';
+                            } else if (req.team === 'rd') {
+                                sameRowNote = '<br><span class="request-adjacency">Same row preferred</span>';
+                            }
+                        }
+                        const chaoticNote = req.chaotic ? '<br><span style="color:#ca8a2a;font-size:9px;">⚠ Specs may change</span>' : '';
                         return `
                 <div class="request-card ${req.isUrgent ? 'urgent' : ''} ${gameState.selectedRequest?.id === req.id ? 'selected' : ''}"
                      data-id="${req.id}">
                     <div class="request-team ${req.team}">${req.team.toUpperCase()}</div>
                     <div class="request-name">${req.name}</div>
                     <div class="request-details">
-                        ${req.racks} racks | ${req.duration} days
+                        ${req.racks} racks | ${req.duration} days | ${req.domain || 'general'}
                         <br>
                         <span class="request-deadline">Due: ${req.deadline - req.daysWaiting} days</span>
-                        ${sameRowNote}
+                        ${sameRowNote}${chaoticNote}
                     </div>
                 </div>
             `;
@@ -1121,27 +3099,115 @@
             }
 
             function updateSatisfactionDisplay() {
-                ['rd', 'sales', 'benchmark'].forEach((team) => {
+                const teams = gameState.aiTeamJoined ?
+                    ['rd', 'sales', 'benchmark', 'ai'] :
+                    ['rd', 'sales', 'benchmark'];
+
+                teams.forEach((team) => {
                     const value = gameState.satisfaction[team];
                     const fill = document.getElementById(`${team}Fill`);
                     const valueEl = document.getElementById(`${team}Value`);
 
-                    fill.style.width = `${value}%`;
-                    fill.className = `satisfaction-fill ${getSatisfactionClass(value)}`;
-                    valueEl.textContent = `${value}%`;
+                    if (fill && valueEl) {
+                        fill.style.width = `${value}%`;
+                        fill.className = `satisfaction-fill ${getSatisfactionClass(value)}`;
+                        valueEl.textContent = `${value}%`;
+                    }
                 });
+            }
+
+            function renderStaffRoster() {
+                const roster = document.getElementById('staffRoster');
+                if (!roster) return;
+
+                if (gameState.staff.length === 0) {
+                    roster.innerHTML = '<div style="opacity:0.5;font-size:11px;">No specialists hired</div>';
+                    return;
+                }
+
+                roster.innerHTML = gameState.staff.map(s => `
+                    <div class="staff-figure ${s.specialty}" data-id="${s.id}" onclick="fireStaff(${s.id})" title="Click to dismiss ${s.specialty} specialist">
+                        <div class="head"></div>
+                        <div class="body"></div>
+                        <div class="legs">
+                            <div class="leg"></div>
+                            <div class="leg"></div>
+                        </div>
+                        <div class="specialty-badge">${s.specialty.charAt(0).toUpperCase()}</div>
+                    </div>
+                `).join('');
+            }
+
+            function renderUpgrades() {
+                const grid = document.getElementById('upgradeGrid');
+                if (!grid) return;
+
+                let html = '';
+
+                Object.entries(upgradeDefinitions).forEach(([type, upgrades]) => {
+                    const currentLevel = gameState.upgrades[type];
+                    if (currentLevel < upgrades.length) {
+                        const upgrade = upgrades[currentLevel];
+                        let cost = upgrade.cost;
+                        if (gameState.upgradeDiscount) {
+                            cost = Math.floor(cost * (1 - gameState.upgradeDiscount));
+                        }
+                        const canAfford = gameState.budget.current >= cost;
+                        html += `
+                            <div class="upgrade-card ${canAfford ? '' : 'disabled'}" onclick="purchaseUpgrade('${type}')">
+                                <div>${upgrade.name}</div>
+                                <div style="font-size:9px;opacity:0.8;">${upgrade.description}</div>
+                                <div class="cost">$${cost.toLocaleString()}${gameState.upgradeDiscount ? ' (SALE)' : ''}</div>
+                            </div>
+                        `;
+                    } else {
+                        html += `
+                            <div class="upgrade-card purchased">
+                                <div>${upgrades[upgrades.length-1].name}</div>
+                                <div style="font-size:9px;opacity:0.8;">Purchased</div>
+                            </div>
+                        `;
+                    }
+                });
+
+                grid.innerHTML = html;
+            }
+
+            function updateBudgetDisplay() {
+                const remaining = document.getElementById('budgetRemaining');
+                const fill = document.getElementById('budgetFill');
+                const monthly = document.getElementById('monthlyCosts');
+                const yearEl = document.getElementById('budgetYear');
+
+                if (!remaining) return;
+
+                remaining.textContent = `$${gameState.budget.current.toLocaleString()}`;
+                remaining.className = `budget-amount ${getBudgetStatus()}`;
+
+                const ratio = Math.max(0, gameState.budget.current / gameState.budget.yearly);
+                fill.style.width = `${Math.min(100, ratio * 100)}%`;
+                fill.style.background = ratio > 0.5 ? 'var(--budget-green)' :
+                    ratio > 0.2 ? 'var(--budget-yellow)' : 'var(--budget-red)';
+
+                monthly.textContent = `$${calculateMonthlyExpenses().toLocaleString()}`;
+                yearEl.textContent = getCalendarYear();
             }
 
             function updateDisplay() {
                 document.getElementById('dateDisplay').textContent = formatDate(gameState.day);
                 document.getElementById('dayCounter').textContent = `Day ${gameState.day} / ${gameState.totalDays}`;
                 document.getElementById('capacityUsed').textContent = gameState.capacityUsedToday;
+                document.getElementById('maxCapacityDisplay').textContent = gameState.maxCapacity;
                 document.getElementById('deproQueue').textContent = gameState.deproQueue.length;
+                document.getElementById('teamSize').textContent = 2 + gameState.staff.length;
 
                 renderRacks();
                 renderRequests();
                 updateSatisfactionDisplay();
                 updatePlaceButton();
+                renderStaffRoster();
+                renderUpgrades();
+                updateBudgetDisplay();
             }
 
             function updatePlaceButton() {
@@ -1176,6 +3242,9 @@
                     } else if (placement.penalty) {
                         btn.disabled = false;
                         btn.textContent = `Place (${placement.penalty} penalty)`;
+                    } else if (placement.bonus) {
+                        btn.disabled = false;
+                        btn.textContent = `Place (+${placement.bonus} bonus)`;
                     } else {
                         btn.disabled = false;
                         btn.textContent = 'Place Job';
@@ -1212,7 +3281,8 @@
 
             function handleRackClick(index) {
                 if (!gameState.selectedRequest) return;
-                // Can't place on occupied or deprovisioning racks
+                // Can't place on occupied, deprovisioning, or unavailable racks
+                if (index >= gameState.rackCount) return;
                 if (gameState.racks[index] !== null) return;
 
                 const idx = gameState.selectedRacks.indexOf(index);
@@ -1222,6 +3292,7 @@
                     gameState.selectedRacks.push(index);
                 }
 
+                playSound('click');
                 updateDisplay();
             }
 
@@ -1238,7 +3309,10 @@
             // GAME OVER / VICTORY
             // ============================================
             function checkGameOver() {
-                const teams = ['rd', 'sales', 'benchmark'];
+                const teams = gameState.aiTeamJoined ?
+                    ['rd', 'sales', 'benchmark', 'ai'] :
+                    ['rd', 'sales', 'benchmark'];
+
                 for (const team of teams) {
                     if (gameState.satisfaction[team] < 20) {
                         gameState.gameOver = true;
@@ -1253,19 +3327,22 @@
                 const reason = document.getElementById('gameOverReason');
                 const stats = document.getElementById('gameOverStats');
 
-                const teamNames = { rd: 'R&D', sales: 'Sales', benchmark: 'Benchmark' };
-                reason.textContent = `${teamNames[failedTeam]} satisfaction dropped below 20%.`;
+                const teamNames = { rd: 'R&D', sales: 'Sales', benchmark: 'Benchmark', ai: 'AI/ML' };
+                reason.textContent = `${teamNames[failedTeam]} has migrated to the cloud. You've lost them.`;
 
                 const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
                 const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
 
                 stats.innerHTML = `
-                Survived ${gameState.day} days (${formatDate(gameState.day)})<br>
-                Jobs completed: ${totalCompleted}<br>
-                Jobs missed: ${totalMissed}
-            `;
+                    Survived ${gameState.day} days (${formatDate(gameState.day)})<br>
+                    Year ${getGameYear()} of ${gameState.campaignYears}<br>
+                    Jobs completed: ${totalCompleted}<br>
+                    Jobs missed: ${totalMissed}<br>
+                    Budget remaining: $${gameState.budget.current.toLocaleString()}
+                `;
 
                 modal.classList.add('active');
+                playSound('alert');
             }
 
             function showVictory() {
@@ -1275,16 +3352,23 @@
                 const totalCompleted = Object.values(gameState.jobsCompleted).reduce((a, b) => a + b, 0);
                 const totalMissed = Object.values(gameState.jobsMissed).reduce((a, b) => a + b, 0);
 
+                let satLine = `R&D: ${gameState.satisfaction.rd}% | Sales: ${gameState.satisfaction.sales}% | Benchmark: ${gameState.satisfaction.benchmark}%`;
+                if (gameState.aiTeamJoined) {
+                    satLine += ` | AI/ML: ${gameState.satisfaction.ai}%`;
+                }
+
                 stats.innerHTML = `
-                Final satisfaction:<br>
-                R&D: ${gameState.satisfaction.rd}% |
-                Sales: ${gameState.satisfaction.sales}% |
-                Benchmark: ${gameState.satisfaction.benchmark}%<br><br>
-                Jobs completed: ${totalCompleted}<br>
-                Jobs missed: ${totalMissed}
-            `;
+                    Campaign: ${gameState.campaignYears} years completed!<br><br>
+                    Final satisfaction:<br>
+                    ${satLine}<br><br>
+                    Jobs completed: ${totalCompleted}<br>
+                    Jobs missed: ${totalMissed}<br>
+                    Staff hired: ${gameState.staff.length}<br>
+                    Budget remaining: $${gameState.budget.current.toLocaleString()}
+                `;
 
                 modal.classList.add('active');
+                playSound('success');
             }
 
             // ============================================
@@ -1300,13 +3384,21 @@
                 document.getElementById('placeBtn').addEventListener('click', handlePlace);
                 document.getElementById('advanceBtn').addEventListener('click', advanceDay);
                 document.getElementById('fastForwardBtn').addEventListener('click', fastForward);
+                document.getElementById('musicToggle').addEventListener('click', toggleMusic);
+                document.getElementById('sfxToggle').addEventListener('click', toggleSfx);
+
+                // Custom years input
+                document.getElementById('customYears').addEventListener('change', () => {
+                    selectedCampaignYears = parseInt(document.getElementById('customYears').value) || 5;
+                });
 
                 updateDisplay();
                 logEvent('Welcome to 2015. Your datacenter awaits.');
+                checkStoryMilestones();
             }
 
-            // Start the game
-            init();
+            // Don't auto-start - wait for campaign selection
+            // Game starts when startGame() is called from modal
         </script>
     </body>
 </html>
