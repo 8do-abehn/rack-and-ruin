@@ -1559,6 +1559,11 @@
         </div>
 
         <script>
+            /* eslint-disable no-unused-vars */
+            // Functions used by onclick handlers in HTML:
+            // selectCampaign, closeCloudProposal, purchaseUpgrade, hireStaff, fireStaff, togglePanel, startGame, continueGame, newGameConfirm, clearSave
+            // Future features (not yet wired up): specializeRack, getStaffCapacityBonus
+
             // ============================================
             // GAME CONFIGURATION
             // ============================================
@@ -2005,12 +2010,7 @@
             // ============================================
             // AUDIO SYSTEM
             // ============================================
-            const audioContext = {
-                music: null,
-                initialized: false
-            };
-
-            function playSound(type) {
+            function playSound(/* type */) {
                 if (!gameState.audio.sfxEnabled) return;
                 // Placeholder - actual audio files would be loaded here
                 // Types: 'click', 'place', 'advance', 'alert', 'success', 'event'
@@ -2128,7 +2128,7 @@
                 let capacity = CONFIG.BASE_CAPACITY;
 
                 // Staff bonuses
-                gameState.staff.forEach(s => {
+                gameState.staff.forEach(() => {
                     capacity += CONFIG.CAPACITY_PER_STAFF;
                 });
 
