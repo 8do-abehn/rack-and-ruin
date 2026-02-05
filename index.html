@@ -1404,11 +1404,15 @@
                     </div>
 
                     <div class="capacity-panel">
-                        <h2>Sysadmin Team</h2>
+                        <h2>Staff</h2>
                         <div class="capacity-info">
-                            <div>Team: <span id="teamSize">2</span> people</div>
-                            <div>Used today: <span class="capacity-used" id="capacityUsed">0</span> / <span id="maxCapacityDisplay">8</span> racks</div>
-                            <div>Depro queue: <span id="deproQueue">0</span> racks</div>
+                            <div id="staffBreakdown">
+                                <span style="color:var(--staff-generalist)">●</span> 2 Base
+                            </div>
+                            <div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--grid-line);">
+                                Capacity: <span class="capacity-used" id="capacityUsed">0</span> / <span id="maxCapacityDisplay">8</span> racks/day
+                            </div>
+                            <div>Depro queue: <span id="deproQueue">0</span></div>
                         </div>
                     </div>
 
@@ -2067,7 +2071,6 @@
             // ============================================
             function hireStaff(specialty) {
                 const salary = CONFIG.STAFF_SALARIES[specialty];
-                const cost = gameState.discountedHire ? salary * 6 : salary * 12; // Annual cost consideration
 
                 if (gameState.budget.current < salary * 3) {
                     logEvent(`Cannot afford ${specialty} specialist`);
@@ -2083,6 +2086,10 @@
                 gameState.staff.push(newStaff);
                 gameState.discountedHire = false;
                 updateMaxCapacity();
+
+                // Add animated worker to floor
+                addWorkerForStaff(newStaff);
+
                 logEvent(`Hired ${specialty} specialist ($${salary.toLocaleString()}/mo)`);
                 playSound('success');
                 updateDisplay();
@@ -2094,6 +2101,10 @@
                     const staff = gameState.staff[idx];
                     gameState.staff.splice(idx, 1);
                     updateMaxCapacity();
+
+                    // Remove animated worker from floor
+                    removeWorkerForStaff(staffId);
+
                     logEvent(`${staff.specialty} specialist departed`);
                     updateDisplay();
                 }
@@ -2762,16 +2773,25 @@
             // ============================================
             const workerState = {
                 workers: [],
-                animations: [],
-                nextWorkerId: 1
+                nextWorkerId: 1,
+                initialized: false
             };
 
-            function createFloorWorker(specialty) {
+            function initializeWorkers() {
+                if (workerState.initialized) return;
+                // Start with 2 base generalist workers
+                createFloorWorker('generalist', 'base-1');
+                createFloorWorker('generalist', 'base-2');
+                workerState.initialized = true;
+            }
+
+            function createFloorWorker(specialty, staffId) {
                 const worker = {
                     id: workerState.nextWorkerId++,
+                    staffId: staffId || null,
                     specialty: specialty,
                     x: -30,
-                    y: 100,
+                    y: 50 + workerState.workers.length * 35,
                     carrying: null,
                     busy: false,
                     element: null
@@ -2801,18 +2821,60 @@
                 return worker;
             }
 
-            function getAvailableWorker() {
-                // First try to find a non-busy worker
-                let worker = workerState.workers.find(w => !w.busy);
-                if (worker) return worker;
+            function addWorkerForStaff(staffMember) {
+                createFloorWorker(staffMember.specialty, staffMember.id);
+                updateStaffBreakdown();
+            }
 
-                // If no workers exist yet or all are busy, create a generalist
-                if (workerState.workers.length < 4) {
-                    const specialties = ['compute', 'network', 'storage', 'generalist'];
-                    return createFloorWorker(specialties[workerState.workers.length % specialties.length]);
+            function removeWorkerForStaff(staffId) {
+                const idx = workerState.workers.findIndex(w => w.staffId === staffId);
+                if (idx >= 0) {
+                    const worker = workerState.workers[idx];
+                    if (worker.element) {
+                        worker.element.remove();
+                    }
+                    workerState.workers.splice(idx, 1);
+                }
+                updateStaffBreakdown();
+            }
+
+            function getAvailableWorker() {
+                // Find a non-busy worker
+                return workerState.workers.find(w => !w.busy) || null;
+            }
+
+            function updateStaffBreakdown() {
+                const breakdown = document.getElementById('staffBreakdown');
+                if (!breakdown) return;
+
+                // Count by specialty
+                const counts = { generalist: 2 }; // 2 base workers
+                gameState.staff.forEach(s => {
+                    counts[s.specialty] = (counts[s.specialty] || 0) + 1;
+                });
+
+                const colors = {
+                    generalist: 'var(--staff-generalist)',
+                    network: 'var(--staff-network)',
+                    storage: 'var(--staff-storage)',
+                    compute: 'var(--staff-compute)'
+                };
+
+                const labels = {
+                    generalist: 'Base',
+                    network: 'Net',
+                    storage: 'Stor',
+                    compute: 'Comp'
+                };
+
+                let html = '';
+                for (const [spec, count] of Object.entries(counts)) {
+                    if (count > 0) {
+                        html += `<span style="color:${colors[spec]}">●</span> ${count} ${labels[spec]} `;
+                    }
                 }
 
-                return null;
+                breakdown.innerHTML = html || '<span style="color:var(--staff-generalist)">●</span> 2 Base';
             }
 
             function getRackPosition(rackIndex) {
@@ -3199,7 +3261,6 @@
                 document.getElementById('capacityUsed').textContent = gameState.capacityUsedToday;
                 document.getElementById('maxCapacityDisplay').textContent = gameState.maxCapacity;
                 document.getElementById('deproQueue').textContent = gameState.deproQueue.length;
-                document.getElementById('teamSize').textContent = 2 + gameState.staff.length;
 
                 renderRacks();
                 renderRequests();
@@ -3208,6 +3269,7 @@
                 renderStaffRoster();
                 renderUpgrades();
                 updateBudgetDisplay();
+                updateStaffBreakdown();
             }
 
             function updatePlaceButton() {
@@ -3391,6 +3453,10 @@
                 document.getElementById('customYears').addEventListener('change', () => {
                     selectedCampaignYears = parseInt(document.getElementById('customYears').value) || 5;
                 });
+
+                // Initialize the 2 base workers
+                initializeWorkers();
+                updateStaffBreakdown();
 
                 updateDisplay();
                 logEvent('Welcome to 2015. Your datacenter awaits.');
