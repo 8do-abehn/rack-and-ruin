@@ -1482,7 +1482,7 @@
                 <h2>GAME OVER</h2>
                 <p id="gameOverReason">A team's satisfaction dropped below 20%.</p>
                 <p id="gameOverStats"></p>
-                <button class="btn primary" onclick="location.reload()">Try Again</button>
+                <button class="btn primary" onclick="clearSave(); location.reload()">Try Again</button>
             </div>
         </div>
 
@@ -1492,7 +1492,7 @@
                 <h2>VICTORY!</h2>
                 <p>You survived a decade of datacenter management!</p>
                 <p id="victoryStats"></p>
-                <button class="btn primary" onclick="location.reload()">Play Again</button>
+                <button class="btn primary" onclick="clearSave(); location.reload()">Play Again</button>
             </div>
         </div>
 
@@ -1509,30 +1509,42 @@
         <div class="modal-overlay active" id="startModal">
             <div class="modal start-modal">
                 <h2>RACK & RUIN</h2>
-                <p>Select your campaign length:</p>
-                <div class="campaign-options">
-                    <div class="campaign-option" data-years="3" onclick="selectCampaign(3)">
-                        <h4>Sprint</h4>
-                        <p>3 years • Intense</p>
-                    </div>
-                    <div class="campaign-option selected" data-years="5" onclick="selectCampaign(5)">
-                        <h4>Standard</h4>
-                        <p>5 years • Balanced</p>
-                    </div>
-                    <div class="campaign-option" data-years="10" onclick="selectCampaign(10)">
-                        <h4>Marathon</h4>
-                        <p>10 years • Epic</p>
-                    </div>
-                    <div class="campaign-option" data-years="custom" onclick="selectCampaign('custom')">
-                        <h4>Custom</h4>
-                        <p>1-15 years</p>
-                    </div>
+
+                <!-- Continue saved game section -->
+                <div id="continueSection" style="display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed var(--grid-line);">
+                    <p>Continue your saved game?</p>
+                    <p id="saveInfo" style="font-size: 11px; opacity: 0.7; margin: 10px 0;"></p>
+                    <button class="btn primary" onclick="continueGame()" style="margin-right: 10px;">Continue</button>
+                    <button class="btn" onclick="newGameConfirm()">New Game</button>
                 </div>
-                <div id="customYearsInput" style="display: none; margin-bottom: 15px;">
-                    <input type="number" id="customYears" min="1" max="15" value="5" style="width: 60px; padding: 5px; background: var(--bg-color); border: 1px solid var(--grid-line); color: var(--text-color);">
-                    <span> years</span>
+
+                <!-- New game section -->
+                <div id="newGameSection">
+                    <p>Select your campaign length:</p>
+                    <div class="campaign-options">
+                        <div class="campaign-option" data-years="3" onclick="selectCampaign(3)">
+                            <h4>Sprint</h4>
+                            <p>3 years • Intense</p>
+                        </div>
+                        <div class="campaign-option selected" data-years="5" onclick="selectCampaign(5)">
+                            <h4>Standard</h4>
+                            <p>5 years • Balanced</p>
+                        </div>
+                        <div class="campaign-option" data-years="10" onclick="selectCampaign(10)">
+                            <h4>Marathon</h4>
+                            <p>10 years • Epic</p>
+                        </div>
+                        <div class="campaign-option" data-years="custom" onclick="selectCampaign('custom')">
+                            <h4>Custom</h4>
+                            <p>1-15 years</p>
+                        </div>
+                    </div>
+                    <div id="customYearsInput" style="display: none; margin-bottom: 15px;">
+                        <input type="number" id="customYears" min="1" max="15" value="5" style="width: 60px; padding: 5px; background: var(--bg-color); border: 1px solid var(--grid-line); color: var(--text-color);">
+                        <span> years</span>
+                    </div>
+                    <button class="btn primary" onclick="startGame()">Begin</button>
                 </div>
-                <button class="btn primary" onclick="startGame()">Begin</button>
             </div>
         </div>
 
@@ -2391,6 +2403,144 @@
             }
 
             // ============================================
+            // SAVE/LOAD SYSTEM
+            // ============================================
+            const SAVE_KEY = 'rackAndRuin_save';
+
+            function saveGame() {
+                const saveData = {
+                    version: '2.0',
+                    timestamp: Date.now(),
+                    gameState: {
+                        day: gameState.day,
+                        totalDays: gameState.totalDays,
+                        campaignYears: gameState.campaignYears,
+                        gameStarted: gameState.gameStarted,
+                        satisfaction: gameState.satisfaction,
+                        rackCount: gameState.rackCount,
+                        racks: gameState.racks,
+                        requests: gameState.requests,
+                        capacityUsedToday: gameState.capacityUsedToday,
+                        maxCapacity: gameState.maxCapacity,
+                        deproQueue: gameState.deproQueue,
+                        jobsCompleted: gameState.jobsCompleted,
+                        jobsMissed: gameState.jobsMissed,
+                        gameOver: gameState.gameOver,
+                        victory: gameState.victory,
+                        budget: gameState.budget,
+                        staff: gameState.staff,
+                        upgrades: gameState.upgrades,
+                        rackSpecializations: gameState.rackSpecializations,
+                        aiTeamJoined: gameState.aiTeamJoined,
+                        cloudWarningsShown: gameState.cloudWarningsShown,
+                        storyMilestones: gameState.storyMilestones,
+                        eventsThisYear: gameState.eventsThisYear
+                    }
+                };
+                try {
+                    localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
+                } catch (e) {
+                    console.warn('Failed to save game:', e);
+                }
+            }
+
+            function loadGame() {
+                try {
+                    const saved = localStorage.getItem(SAVE_KEY);
+                    if (!saved) return false;
+
+                    const saveData = JSON.parse(saved);
+                    if (saveData.version !== '2.0') return false;
+
+                    const gs = saveData.gameState;
+
+                    // Restore game state
+                    gameState.day = gs.day;
+                    gameState.totalDays = gs.totalDays;
+                    gameState.campaignYears = gs.campaignYears;
+                    gameState.gameStarted = gs.gameStarted;
+                    gameState.satisfaction = gs.satisfaction;
+                    gameState.rackCount = gs.rackCount;
+                    gameState.racks = gs.racks;
+                    gameState.requests = gs.requests;
+                    gameState.capacityUsedToday = gs.capacityUsedToday;
+                    gameState.maxCapacity = gs.maxCapacity;
+                    gameState.deproQueue = gs.deproQueue;
+                    gameState.jobsCompleted = gs.jobsCompleted;
+                    gameState.jobsMissed = gs.jobsMissed;
+                    gameState.gameOver = gs.gameOver;
+                    gameState.victory = gs.victory;
+                    gameState.budget = gs.budget;
+                    gameState.staff = gs.staff;
+                    gameState.upgrades = gs.upgrades;
+                    gameState.rackSpecializations = gs.rackSpecializations;
+                    gameState.aiTeamJoined = gs.aiTeamJoined;
+                    gameState.cloudWarningsShown = gs.cloudWarningsShown;
+                    gameState.storyMilestones = gs.storyMilestones;
+                    gameState.eventsThisYear = gs.eventsThisYear || [];
+
+                    return true;
+                } catch (e) {
+                    console.warn('Failed to load game:', e);
+                    return false;
+                }
+            }
+
+            function clearSave() {
+                localStorage.removeItem(SAVE_KEY);
+            }
+
+            function hasSavedGame() {
+                return localStorage.getItem(SAVE_KEY) !== null;
+            }
+
+            function checkForSavedGame() {
+                if (hasSavedGame()) {
+                    try {
+                        const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
+                        const saveDate = new Date(saved.timestamp).toLocaleDateString();
+                        const gs = saved.gameState;
+                        document.getElementById('saveInfo').textContent =
+                            `Day ${gs.day} / ${gs.totalDays} • Saved ${saveDate}`;
+                        document.getElementById('continueSection').style.display = 'block';
+                        document.getElementById('newGameSection').style.display = 'none';
+                    } catch (e) {
+                        // Invalid save, show new game
+                    }
+                }
+            }
+
+            function continueGame() {
+                if (loadGame()) {
+                    document.getElementById('startModal').classList.remove('active');
+
+                    // Restore UI state
+                    if (gameState.aiTeamJoined) {
+                        document.getElementById('aiSatisfactionRow').classList.remove('hidden');
+                    }
+
+                    // Initialize workers for existing staff
+                    initializeWorkers();
+                    gameState.staff.forEach(s => addWorkerForStaff(s));
+
+                    // Update progressive reveal
+                    updateProgressiveReveal();
+
+                    updateDisplay();
+                    logEvent('Game loaded. Welcome back!');
+                }
+            }
+
+            function newGameConfirm() {
+                clearSave();
+                document.getElementById('continueSection').style.display = 'none';
+                document.getElementById('newGameSection').style.display = 'block';
+            }
+
+            // Check for saved game on page load
+            document.addEventListener('DOMContentLoaded', checkForSavedGame);
+
+            // ============================================
             // RACK FUNCTIONS
             // ============================================
             function getRackRow(index) {
@@ -2759,6 +2909,7 @@
 
                 playSound('advance');
                 updateDisplay();
+                saveGame();
             }
 
             function fastForward() {
