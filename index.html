@@ -673,6 +673,75 @@
                 color: var(--accent-blue);
             }
 
+            .infra-meter {
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid var(--grid-line);
+            }
+
+            .meter-label {
+                display: flex;
+                justify-content: space-between;
+                font-size: clamp(9px, 1vw, 11px);
+                margin-bottom: 4px;
+            }
+
+            .meter-bar {
+                height: 8px;
+                background: rgba(40, 50, 70, 0.8);
+                border: 1px solid var(--grid-line);
+                border-radius: 2px;
+                overflow: hidden;
+            }
+
+            .meter-fill {
+                height: 100%;
+                background: var(--budget-green);
+                transition:
+                    width 0.3s,
+                    background-color 0.3s;
+            }
+
+            .meter-fill.warning {
+                background: var(--budget-yellow);
+            }
+
+            .meter-fill.danger {
+                background: var(--budget-red);
+            }
+
+            .meter-fill.cooling {
+                background: #4a9fff;
+            }
+
+            .meter-fill.cooling.warning {
+                background: var(--budget-yellow);
+            }
+
+            .meter-fill.cooling.danger {
+                background: var(--budget-red);
+            }
+
+            .upgrade-btn.small {
+                margin-top: 4px;
+                padding: 2px 6px;
+                font-size: 9px;
+                background: rgba(40, 60, 100, 0.8);
+                border: 1px solid var(--accent-blue);
+                color: var(--accent-blue);
+                cursor: pointer;
+                border-radius: 2px;
+            }
+
+            .upgrade-btn.small:hover {
+                background: rgba(60, 80, 120, 0.8);
+            }
+
+            .upgrade-btn.small:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
             /* Staff Panel */
             .staff-panel {
                 background: rgba(20, 30, 50, 0.8);
@@ -1579,6 +1648,30 @@
                                 <span>Hardware Gen:</span>
                                 <span class="stats-value" id="hardwareGenDisplay">Gen 1</span>
                             </div>
+                            <div class="infra-meter">
+                                <div class="meter-label">
+                                    <span>⚡ Power:</span>
+                                    <span id="powerDisplay">0 / 50 kW</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill" id="powerFill" style="width: 0%"></div>
+                                </div>
+                                <button class="upgrade-btn small" id="powerUpgradeBtn" onclick="upgradePower()">
+                                    Upgrade $50k
+                                </button>
+                            </div>
+                            <div class="infra-meter">
+                                <div class="meter-label">
+                                    <span>❄️ Cooling:</span>
+                                    <span id="coolingDisplay">0 / 40 tons</span>
+                                </div>
+                                <div class="meter-bar">
+                                    <div class="meter-fill cooling" id="coolingFill" style="width: 0%"></div>
+                                </div>
+                                <button class="upgrade-btn small" id="coolingUpgradeBtn" onclick="upgradeCooling()">
+                                    Upgrade $40k
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1749,7 +1842,7 @@
         <script>
             /* eslint-disable no-unused-vars */
             // Functions used by onclick handlers in HTML:
-            // selectCampaign, closeCloudProposal, purchaseUpgrade, hireStaff, fireStaff, togglePanel, startGame, continueGame, newGameConfirm, clearSave
+            // selectCampaign, closeCloudProposal, purchaseUpgrade, hireStaff, fireStaff, togglePanel, startGame, continueGame, newGameConfirm, clearSave, upgradePower, upgradeCooling
             // Future features (not yet wired up): specializeRack, getStaffCapacityBonus
 
             // ============================================
@@ -1773,6 +1866,21 @@
                     HARDWARE_YEAR: 2,
                     EVENTS_YEAR: 3,
                 },
+                // Infrastructure
+                POWER_PER_RACK: 10, // kW per occupied rack
+                COOLING_PER_RACK: 8, // tons per occupied rack
+                POWER_UPGRADES: [
+                    { capacity: 50, cost: 0, name: 'Basic Panel' },
+                    { capacity: 100, cost: 50000, name: '100kW Transformer' },
+                    { capacity: 200, cost: 100000, name: '200kW Transformer' },
+                    { capacity: 500, cost: 200000, name: '500kW Service' },
+                ],
+                COOLING_UPGRADES: [
+                    { capacity: 40, cost: 0, name: 'Basic CRAC' },
+                    { capacity: 80, cost: 40000, name: '80 Ton CRAC' },
+                    { capacity: 150, cost: 80000, name: '150 Ton Chiller' },
+                    { capacity: 300, cost: 150000, name: '300 Ton Plant' },
+                ],
             };
 
             // ============================================
@@ -1839,6 +1947,16 @@
                     provisioningSpeed: 0, // 0-2 (each reduces prov time)
                     capacityBoost: 0, // 0-2 (each adds +2 capacity)
                     hardwareGen: 1, // 1-3 (reduces failure chance)
+                    powerCapacity: 0, // 0-3 (power upgrades)
+                    coolingCapacity: 0, // 0-3 (cooling upgrades)
+                },
+
+                // Infrastructure - power and cooling
+                infrastructure: {
+                    powerUsed: 0, // kW currently used
+                    coolingUsed: 0, // tons currently used
+                    powerWarning: false,
+                    coolingWarning: false,
                 },
 
                 // Rack specializations
@@ -2915,6 +3033,7 @@
                         cloudWarningsShown: gameState.cloudWarningsShown,
                         storyMilestones: gameState.storyMilestones,
                         eventsThisYear: gameState.eventsThisYear,
+                        infrastructure: gameState.infrastructure,
                     },
                 };
                 try {
@@ -2958,6 +3077,18 @@
                     gameState.cloudWarningsShown = gs.cloudWarningsShown;
                     gameState.storyMilestones = gs.storyMilestones;
                     gameState.eventsThisYear = gs.eventsThisYear || [];
+
+                    // v2.5 additions with backward compatibility
+                    if (gs.infrastructure) {
+                        gameState.infrastructure = gs.infrastructure;
+                    }
+                    // Ensure upgrade properties exist for older saves
+                    if (gameState.upgrades.powerCapacity === undefined) {
+                        gameState.upgrades.powerCapacity = 0;
+                    }
+                    if (gameState.upgrades.coolingCapacity === undefined) {
+                        gameState.upgrades.coolingCapacity = 0;
+                    }
 
                     return true;
                 } catch (e) {
@@ -3916,6 +4047,52 @@
                 return occupiedRacks * baseTFLOPS * genMultiplier;
             }
 
+            function getPowerCapacity() {
+                return CONFIG.POWER_UPGRADES[gameState.upgrades.powerCapacity].capacity;
+            }
+
+            function getCoolingCapacity() {
+                return CONFIG.COOLING_UPGRADES[gameState.upgrades.coolingCapacity].capacity;
+            }
+
+            function calculateInfrastructureUsage() {
+                const occupiedRacks = gameState.racks.filter((r) => r !== null).length;
+                gameState.infrastructure.powerUsed = occupiedRacks * CONFIG.POWER_PER_RACK;
+                gameState.infrastructure.coolingUsed = occupiedRacks * CONFIG.COOLING_PER_RACK;
+            }
+
+            function upgradePower() {
+                const nextLevel = gameState.upgrades.powerCapacity + 1;
+                if (nextLevel >= CONFIG.POWER_UPGRADES.length) return;
+
+                const upgrade = CONFIG.POWER_UPGRADES[nextLevel];
+                if (gameState.budget.current < upgrade.cost) {
+                    logEvent(`Cannot afford ${upgrade.name}`);
+                    return;
+                }
+
+                gameState.budget.current -= upgrade.cost;
+                gameState.upgrades.powerCapacity = nextLevel;
+                logEvent(`Upgraded power to ${upgrade.name} (${upgrade.capacity} kW)`);
+                updateDisplay();
+            }
+
+            function upgradeCooling() {
+                const nextLevel = gameState.upgrades.coolingCapacity + 1;
+                if (nextLevel >= CONFIG.COOLING_UPGRADES.length) return;
+
+                const upgrade = CONFIG.COOLING_UPGRADES[nextLevel];
+                if (gameState.budget.current < upgrade.cost) {
+                    logEvent(`Cannot afford ${upgrade.name}`);
+                    return;
+                }
+
+                gameState.budget.current -= upgrade.cost;
+                gameState.upgrades.coolingCapacity = nextLevel;
+                logEvent(`Upgraded cooling to ${upgrade.name} (${upgrade.capacity} tons)`);
+                updateDisplay();
+            }
+
             function updateStatsDisplay() {
                 const tflopsEl = document.getElementById('tflopsDisplay');
                 const racksEl = document.getElementById('racksOnlineDisplay');
@@ -3937,6 +4114,62 @@
 
                 racksEl.textContent = `${occupiedRacks} / ${gameState.rackCount}`;
                 genEl.textContent = `Gen ${gameState.upgrades.hardwareGen}`;
+
+                // Update infrastructure meters
+                calculateInfrastructureUsage();
+
+                const powerCapacity = getPowerCapacity();
+                const coolingCapacity = getCoolingCapacity();
+                const powerUsed = gameState.infrastructure.powerUsed;
+                const coolingUsed = gameState.infrastructure.coolingUsed;
+
+                // Power meter
+                const powerDisplay = document.getElementById('powerDisplay');
+                const powerFill = document.getElementById('powerFill');
+                const powerBtn = document.getElementById('powerUpgradeBtn');
+
+                if (powerDisplay) {
+                    powerDisplay.textContent = `${powerUsed} / ${powerCapacity} kW`;
+                    const powerRatio = powerUsed / powerCapacity;
+                    powerFill.style.width = `${Math.min(100, powerRatio * 100)}%`;
+                    powerFill.className =
+                        'meter-fill' + (powerRatio > 0.9 ? ' danger' : powerRatio > 0.7 ? ' warning' : '');
+
+                    // Update upgrade button
+                    const nextPower = gameState.upgrades.powerCapacity + 1;
+                    if (nextPower >= CONFIG.POWER_UPGRADES.length) {
+                        powerBtn.textContent = 'MAX';
+                        powerBtn.disabled = true;
+                    } else {
+                        const cost = CONFIG.POWER_UPGRADES[nextPower].cost;
+                        powerBtn.textContent = `Upgrade $${(cost / 1000).toFixed(0)}k`;
+                        powerBtn.disabled = gameState.budget.current < cost;
+                    }
+                }
+
+                // Cooling meter
+                const coolingDisplay = document.getElementById('coolingDisplay');
+                const coolingFill = document.getElementById('coolingFill');
+                const coolingBtn = document.getElementById('coolingUpgradeBtn');
+
+                if (coolingDisplay) {
+                    coolingDisplay.textContent = `${coolingUsed} / ${coolingCapacity} tons`;
+                    const coolingRatio = coolingUsed / coolingCapacity;
+                    coolingFill.style.width = `${Math.min(100, coolingRatio * 100)}%`;
+                    coolingFill.className =
+                        'meter-fill cooling' + (coolingRatio > 0.9 ? ' danger' : coolingRatio > 0.7 ? ' warning' : '');
+
+                    // Update upgrade button
+                    const nextCooling = gameState.upgrades.coolingCapacity + 1;
+                    if (nextCooling >= CONFIG.COOLING_UPGRADES.length) {
+                        coolingBtn.textContent = 'MAX';
+                        coolingBtn.disabled = true;
+                    } else {
+                        const cost = CONFIG.COOLING_UPGRADES[nextCooling].cost;
+                        coolingBtn.textContent = `Upgrade $${(cost / 1000).toFixed(0)}k`;
+                        coolingBtn.disabled = gameState.budget.current < cost;
+                    }
+                }
             }
 
             function updateDisplay() {
