@@ -1935,8 +1935,10 @@
                     ai: 60,
                 },
 
-                // Start with 9 racks (3x3), expandable to 15+
-                rackCount: 9,
+                // Rack system - start with 3 owned, max 15 slots
+                ownedRacks: 3, // How many racks purchased
+                rackCount: 3, // Visible/usable racks (same as ownedRacks for now)
+                maxRackSlots: 15, // Maximum possible slots
                 racks: Array(15).fill(null),
 
                 // Request queue
@@ -2832,7 +2834,9 @@
 
                 // Apply upgrade effects
                 if (upgradeType === 'rackExpansion') {
-                    gameState.rackCount = 9 + gameState.upgrades.rackExpansion * 3;
+                    // Legacy upgrade - adds 3 racks per level
+                    gameState.ownedRacks = 3 + gameState.upgrades.rackExpansion * 3;
+                    gameState.rackCount = gameState.ownedRacks;
                 }
 
                 updateMaxCapacity();
@@ -3084,6 +3088,7 @@
                         campaignYears: gameState.campaignYears,
                         gameStarted: gameState.gameStarted,
                         satisfaction: gameState.satisfaction,
+                        ownedRacks: gameState.ownedRacks,
                         rackCount: gameState.rackCount,
                         racks: gameState.racks,
                         requests: gameState.requests,
@@ -3128,6 +3133,7 @@
                     gameState.campaignYears = gs.campaignYears;
                     gameState.gameStarted = gs.gameStarted;
                     gameState.satisfaction = gs.satisfaction;
+                    gameState.ownedRacks = gs.ownedRacks || gs.rackCount || 3; // Backward compat
                     gameState.rackCount = gs.rackCount;
                     gameState.racks = gs.racks;
                     gameState.requests = gs.requests;
