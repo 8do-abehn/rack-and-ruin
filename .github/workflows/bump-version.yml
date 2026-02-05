@@ -11,6 +11,9 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     # Don't run on commits from this workflow
     if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'Bump version')"
 
