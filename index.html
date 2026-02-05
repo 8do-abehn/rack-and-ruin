@@ -2538,7 +2538,8 @@
             }
 
             // Check for saved game on page load
-            document.addEventListener('DOMContentLoaded', checkForSavedGame);
+            // Call immediately since script is at end of body (DOM already ready)
+            checkForSavedGame();
 
             // ============================================
             // RACK FUNCTIONS
