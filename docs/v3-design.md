@@ -1,13 +1,13 @@
 # Rack & Ruin v3.0 - Design Document
 
 ## Vision
-A Tetris-meets-datacenter management sim where computing laws drive the physics and story.
+A time-management datacenter sim where computing laws drive the physics and story.
 
 ---
 
 ## Core Gameplay Loop
 
-1. **Requests queue up** (right side) - like Tetris pieces waiting
+1. **Requests queue up** (right side) - like orders in a kitchen
 2. **Queue overflow = game over** (replaces team satisfaction)
 3. **Select job** → hardware appears at dock (left)
 4. **Workers carry equipment** → install in racks
@@ -406,7 +406,7 @@ Upgrades:
 
 ---
 
-## Queue Mechanics (Tetris-Style)
+## Queue Mechanics (Order Queue Style)
 
 ### Queue Behavior
 - New requests appear at top
@@ -477,7 +477,7 @@ Add:
 - Cooling meter & upgrades
 - Equipment catalog
 - Dock/staging area
-- Tetris-style queue
+- Order queue (time management style)
 
 ---
 
