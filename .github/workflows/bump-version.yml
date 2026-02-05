@@ -53,8 +53,11 @@ jobs:
           git commit -m "Bump version to $NEW_VERSION"
           git push -u origin "$BRANCH"
 
-          gh pr create \
+          PR_URL=$(gh pr create \
             --title "Bump version to $NEW_VERSION" \
-            --body "Automated version bump to $NEW_VERSION" \
+            --body "Automated patch version bump to $NEW_VERSION" \
             --head "$BRANCH" \
-            --base main
+            --base main)
+
+          # Auto-merge patch version bumps (no approval needed)
+          gh pr merge "$PR_URL" --auto --squash --delete-branch
