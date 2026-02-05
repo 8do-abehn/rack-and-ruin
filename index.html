@@ -3596,7 +3596,7 @@
                             placeholder.className = 'rack';
                             placeholder.style.opacity = '0.2';
                             placeholder.style.cursor = 'not-allowed';
-                            placeholder.innerHTML = `<div class="rack-label" style="opacity:0.3">--</div>`;
+                            placeholder.innerHTML = '<div class="rack-label" style="opacity:0.3">--</div>';
                             floor.appendChild(placeholder);
                             continue;
                         }
@@ -3640,7 +3640,7 @@
                                     if (s < filledSlots) {
                                         slotsHtml += `<div class="rack-slot filled ${slotClass}"></div>`;
                                     } else {
-                                        slotsHtml += `<div class="rack-slot"></div>`;
+                                        slotsHtml += '<div class="rack-slot"></div>';
                                     }
                                 }
                                 rack.innerHTML = `
