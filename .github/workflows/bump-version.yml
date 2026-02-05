@@ -1,0 +1,50 @@
+name: Bump Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - '!.github/**'
+
+jobs:
+  bump-version:
+    runs-on: ubuntu-latest
+    # Don't run on commits from this workflow
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump version
+        run: |
+          # Extract current version from index.html
+          CURRENT=$(grep -oP 'v\d+\.\d+\.\d+' index.html | head -1)
+          echo "Current version: $CURRENT"
+
+          # Parse version components
+          MAJOR=$(echo $CURRENT | cut -d. -f1 | tr -d 'v')
+          MINOR=$(echo $CURRENT | cut -d. -f2)
+          PATCH=$(echo $CURRENT | cut -d. -f3)
+
+          # Bump patch version
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          echo "New version: $NEW_VERSION"
+
+          # Update index.html
+          sed -i "s/$CURRENT/$NEW_VERSION/g" index.html
+
+          # Set output for commit message
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit version bump
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Bump version to $NEW_VERSION [skip ci]"
+          git push
