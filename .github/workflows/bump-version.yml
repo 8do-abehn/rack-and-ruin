@@ -12,12 +12,10 @@ jobs:
   bump-version:
     runs-on: ubuntu-latest
     # Don't run on commits from this workflow
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: "!contains(github.event.head_commit.message, '[skip ci]') && !contains(github.event.head_commit.message, 'Bump version')"
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Bump version
         run: |
@@ -38,13 +36,25 @@ jobs:
           # Update index.html
           sed -i "s/$CURRENT/$NEW_VERSION/g" index.html
 
-          # Set output for commit message
+          # Set output for next steps
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-      - name: Commit version bump
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          BRANCH="auto/bump-version-$NEW_VERSION"
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git checkout -b "$BRANCH"
           git add index.html
-          git diff --staged --quiet || git commit -m "Bump version to $NEW_VERSION [skip ci]"
-          git push
+          git commit -m "Bump version to $NEW_VERSION"
+          git push -u origin "$BRANCH"
+
+          gh pr create \
+            --title "Bump version to $NEW_VERSION" \
+            --body "Automated version bump to $NEW_VERSION" \
+            --head "$BRANCH" \
+            --base main
