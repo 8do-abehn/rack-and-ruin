@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Rack frame -->
+  <rect x="4" y="2" width="24" height="28" rx="2" fill="#2a3a5a" stroke="#3a4a6a" stroke-width="1"/>
+
+  <!-- Server units -->
+  <rect x="6" y="4" width="20" height="5" rx="1" fill="#4a7a4a"/>
+  <circle cx="9" cy="6.5" r="1" fill="#4aff4a"/>
+
+  <rect x="6" y="11" width="20" height="5" rx="1" fill="#7a4a7a"/>
+  <circle cx="9" cy="13.5" r="1" fill="#4aff4a"/>
+
+  <rect x="6" y="18" width="20" height="5" rx="1" fill="#4a4a7a"/>
+  <circle cx="9" cy="20.5" r="1" fill="#4aff4a"/>
+
+  <!-- Empty slot -->
+  <rect x="6" y="25" width="20" height="3" rx="1" fill="#1a2a3a" opacity="0.5"/>
+</svg>
