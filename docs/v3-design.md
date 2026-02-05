@@ -18,14 +18,26 @@ A Tetris-meets-datacenter management sim where computing laws drive the physics 
 ## Computing Laws as Game Physics
 
 ### Moore's Law (Compute doubles every ~2 years)
-**Mechanic:** Hardware generations
-| Year | Gen | Compute/U | Story Beat |
-|------|-----|-----------|------------|
-| 2015 | 1 | 1x | "Welcome to the Broadwell era" |
-| 2017 | 2 | 2x | "Skylake arrives - double the cores!" |
-| 2019 | 3 | 4x | "Crimson EPYC Rome: 64 cores per socket" |
-| 2021 | 4 | 8x | "Alder Lake & Milan - Moore keeps delivering" |
-| 2023 | 5 | 16x | "Emerald Rapids - but at what power cost?" |
+**Mechanic:** Hardware generations across 30 years
+
+| Year | Gen | Compute/U | Era | Story Beat |
+|------|-----|-----------|-----|------------|
+| 1995 | 1 | 1x | Pentium Pro | "Welcome to the web era. Sun boxes and Cisco routers." |
+| 1997 | 2 | 2x | Pentium II | "Slot 1 arrives. The web is hungry." |
+| 1999 | 3 | 4x | Pentium III | "Dotcom money flows. Everyone wants servers." |
+| 2001 | 4 | 6x | Pentium 4 | "The bubble burst. Do more with less." |
+| 2003 | 5 | 8x | Opteron | "Crimson enters the server market. 64-bit is here." |
+| 2005 | 6 | 12x | Dual-Core | "Two cores, one socket. Moore delivers again." |
+| 2007 | 7 | 20x | Core 2 Quad | "Four cores! But Dennard's ghost awakens..." |
+| 2009 | 8 | 30x | Nehalem | "Memory controllers on-die. The cloud is coming." |
+| 2011 | 9 | 45x | Sandy Bridge | "Cloudscape launches. Should you be worried?" |
+| 2013 | 10 | 70x | Ivy Bridge | "Containers are the new VMs. Everything changes." |
+| 2015 | 11 | 100x | Broadwell | "NVMe arrives. Storage will never be the same." |
+| 2017 | 12 | 150x | Skylake | "Crimson EPYC: 32 cores per socket. Indigo sweats." |
+| 2019 | 13 | 250x | EPYC Rome | "64 cores. The power wall looms." |
+| 2021 | 14 | 400x | Milan/Alder | "The AI team forms. They want everything." |
+| 2023 | 15 | 700x | Emerald/Genoa | "LLMs devour your capacity. Moore can't keep up." |
+| 2025 | 16 | 1000x | Next Gen | "Three decades. You've witnessed the entire arc." |
 
 **Physics:** Newer hardware does more work per U slot.
 
@@ -71,13 +83,19 @@ A Tetris-meets-datacenter management sim where computing laws drive the physics 
 
 | Year | Typical Job Size | Why |
 |------|------------------|-----|
-| 2015 | 3-4 racks | "Docker is new, VMs are king" |
-| 2017 | 4-6 racks | "Kubernetes clusters everywhere" |
-| 2019 | 6-8 racks | "Big data pipelines" |
-| 2021 | 8-12 racks | "AI training needs scale" |
-| 2023 | 12-20 racks | "LLMs are hungry beasts" |
+| 1995 | 1 rack | "A web server. Maybe two for redundancy." |
+| 1998 | 1-2 racks | "E-commerce needs databases now" |
+| 2001 | 2-3 racks | "Java app servers eat memory for breakfast" |
+| 2004 | 2-4 racks | "Three-tier architecture is mandatory" |
+| 2007 | 3-5 racks | "SOA means more servers, not fewer" |
+| 2010 | 4-6 racks | "Big data! Hadoop clusters everywhere" |
+| 2013 | 4-8 racks | "Microservices: 100 containers per app" |
+| 2016 | 5-10 racks | "Kubernetes clusters need room to grow" |
+| 2019 | 8-15 racks | "ML pipelines: training + inference + data" |
+| 2022 | 15-30 racks | "LLMs are hungry beasts" |
+| 2025 | 30-50 racks | "The AI team wants a dedicated wing" |
 
-**Story Beat (2020):** "Remember when 4 racks was a 'big' deployment? Those were the days."
+**Story Beat (2010):** "Remember when one rack was 'a lot'? Those were the days."
 
 **Physics:** This is the core pressure - Moore helps but Wirth eats it all.
 
@@ -119,17 +137,25 @@ A Tetris-meets-datacenter management sim where computing laws drive the physics 
 ### Kryder's Law (Storage density doubles yearly)
 **Mechanic:** Storage costs decrease over time
 
-| Year | Cost per TB | Media |
+| Year | Cost per GB | Media |
 |------|-------------|-------|
-| 2015 | $100 | Spinning disk |
-| 2017 | $50 | Hybrid arrays |
-| 2019 | $25 | SATA SSD |
-| 2021 | $15 | NVMe |
-| 2023 | $10 | NVMe Gen4 |
+| 1995 | $10.00 | SCSI drives |
+| 1998 | $2.00 | IDE drives |
+| 2001 | $0.50 | ATA drives |
+| 2004 | $0.20 | SATA arrives |
+| 2007 | $0.10 | SATA II |
+| 2010 | $0.05 | SATA III |
+| 2013 | $0.03 | Early SSD |
+| 2016 | $0.25/GB SSD, $0.02/GB HDD | Flash premium |
+| 2019 | $0.10/GB SSD | NVMe mainstream |
+| 2022 | $0.05/GB SSD | NVMe Gen4 |
+| 2025 | $0.02/GB SSD | Flash wins |
 
 **But:** Denser storage = more heat per U (SSDs run hot under load)
 
-**Story Beat (2018):** "Kryder's Law is beautiful - until you realize 100TB of NVMe needs its own AC unit."
+**Story Beat (1998):** "Terabyte storage is science fiction. We measure in gigabytes."
+**Story Beat (2012):** "SSDs cost 10x more than disk. Worth it?"
+**Story Beat (2020):** "100TB of NVMe needs its own AC unit."
 
 ---
 
@@ -137,24 +163,31 @@ A Tetris-meets-datacenter management sim where computing laws drive the physics 
 
 ### Power (DC-Level)
 ```
-Starting: 50 kW capacity
+Starting (1995): 15 kW capacity - "Enough for 3 racks"
 Upgrades:
-  - 100 kW transformer ($50k)
-  - 200 kW transformer ($100k)
-  - 500 kW transformer ($200k)
-  - 1 MW substation ($500k)
+  - 30 kW panel ($15k) - 1995+
+  - 50 kW transformer ($30k) - 1998+
+  - 100 kW transformer ($60k) - 2002+
+  - 200 kW transformer ($120k) - 2006+
+  - 500 kW service ($250k) - 2010+
+  - 1 MW substation ($500k) - 2015+
+  - 2 MW substation ($900k) - 2020+
+  - 5 MW campus power ($2M) - 2023+
 ```
 
 **Failure mode:** Exceed capacity → breakers trip → random racks go offline
 
 ### Cooling (DC-Level)
 ```
-Starting: 40 tons capacity
+Starting (1995): 10 tons capacity - "Window AC units, basically"
 Upgrades:
-  - 80 ton CRAC ($40k)
-  - 150 ton CRAC ($80k)
-  - 300 ton chiller plant ($150k)
-  - 500 ton chiller + free cooling ($300k)
+  - 20 ton CRAC ($20k) - 1995+
+  - 40 ton CRAC ($35k) - 1998+
+  - 80 ton CRAC ($60k) - 2003+
+  - 150 ton chiller ($100k) - 2008+
+  - 300 ton chiller plant ($200k) - 2012+
+  - 500 ton + free cooling ($350k) - 2016+
+  - 1000 ton + liquid assist ($600k) - 2020+
 ```
 
 **Failure mode:** Exceed capacity → thermal throttling → jobs slow down → queue backs up
@@ -204,16 +237,21 @@ Upgrades:
 ### Racks (Must Purchase!)
 | Item | Width | Height | Power | Cost | Available |
 |------|-------|--------|-------|------|-----------|
-| Standard 19" Rack | 1x | 42U | 10kW max | $2,000 | 2015+ |
-| Deep 19" Rack | 1x | 42U | 15kW max | $3,500 | 2017+ |
-| OCP Rack (21") | 1x | 48U | 20kW max | $5,000 | 2018+ |
-| Double-Wide HPC | 2x | 42U | 40kW max | $15,000 | 2020+ |
-| Liquid-Cooled Rack | 1x | 42U | 50kW max | $25,000 | 2022+ |
+| Standard 19" Rack | 1x | 42U | 5kW max | $1,500 | 1995+ |
+| Telco Rack (23") | 1x | 42U | 5kW max | $2,000 | 1995+ |
+| Deep 19" Rack | 1x | 42U | 10kW max | $3,000 | 2003+ |
+| High-Density Rack | 1x | 42U | 15kW max | $4,500 | 2010+ |
+| OCP Rack (21") | 1x | 48U | 20kW max | $6,000 | 2016+ |
+| Double-Wide HPC | 2x | 42U | 40kW max | $18,000 | 2018+ |
+| Liquid-Cooled Rack | 1x | 42U | 50kW max | $30,000 | 2021+ |
 
 **Story Beats:**
-- 2018: "Open Compute racks are here - more U's, better airflow, fits the new gear."
-- 2020: "The AI team needs NVIDIA DGX. Those don't fit in standard racks. Time to go double-wide."
-- 2022: "Air cooling can't keep up anymore. Liquid cooling is the future."
+- 1995: "Standard 42U racks. EIA-310 compliant. The foundation of everything."
+- 2003: "Deeper racks for blade servers. Better cable management."
+- 2010: "High-density racks for virtualization. More power, more cooling."
+- 2016: "Open Compute racks are here - more U's, better airflow."
+- 2018: "The AI team needs DGX boxes. Those don't fit in standard racks."
+- 2021: "Air cooling can't keep up. Liquid cooling is the future."
 
 **Rack Mechanics:**
 - Must buy racks before placing equipment
@@ -225,9 +263,28 @@ Upgrades:
 
 ## Datacenter View
 
+### Stats Sidebar
+**Teraflop Counter** - Running total of datacenter compute power
+| Era | Typical TFLOPS | Reference |
+|-----|----------------|-----------|
+| 1995 | 0.001 | "A gigaflop feels fast" |
+| 2000 | 0.01 | "Approaching teraflop territory" |
+| 2005 | 0.1 | "A teraflop datacenter!" |
+| 2010 | 1.0 | "One teraflop. Cray would be proud." |
+| 2015 | 10 | "Ten teraflops. A supercomputer from 2005." |
+| 2020 | 100 | "A hundred teraflops. Petascale dreams." |
+| 2025 | 1000+ | "A petaflop. You've built a national lab." |
+
+**Other Stats:**
+- Total power draw (kW/MW)
+- Cooling capacity vs usage
+- Budget remaining
+- Staff count by specialty
+- Jobs completed this year
+
 ### Default View
 - Grid floor showing all racks
-- Starts with 5 racks (1 row)
+- Starts with 3 racks (1995 starting point)
 - Auto-zooms out as you expand
 - Request queue on right
 - Dock/staging on left
@@ -244,38 +301,108 @@ Upgrades:
 
 ## Story Timeline with Laws
 
-### 2015 - The Beginning
-> "Your datacenter: 5 racks, 50kW, and dreams. Moore's Law says you'll need more."
+### Act 1: The Web Era (1995-2000)
 
-### 2016 - First Growth
-> "The requests keep coming. Time to expand."
+#### 1995 - The Beginning
+> "Your first datacenter: 3 racks, 10kW, and a T1 line. The web awaits."
 
-### 2017 - Skylake Era
-> "Gen 2 hardware arrives! Double the cores, 50% more power draw. Dennard warned us."
+#### 1996 - Growing Pains
+> "Netscape is king. Everyone wants a website. Everyone wants servers."
 
-### 2018 - Storage Explosion
-> "Kryder's Law delivers cheap SSDs. But your cooling bill just doubled."
+#### 1997 - E-Commerce Dawn
+> "They want to sell things online. Time for redundancy."
 
-### 2019 - The Power Wall
-> "Gen 3 chips are amazing. Your power grid... less so. Upgrade or melt."
+#### 1998 - The Boom
+> "VC money flows like water. Build it and they will come."
 
-### 2020 - Cloud Competition
-> "Cloudscape offers 'infinite scale.' Your users are tempted. Keep up or lose them."
+#### 1999 - Y2K Prep
+> "Two-digit years were a mistake. Upgrade everything. NOW."
 
-### 2021 - AI Arrives
-> "The AI team has formed. They want GPUs. Lots of GPUs. Wirth's Law incarnate."
+#### 2000 - Peak Madness
+> "Pets.com has more servers than customers. This can't last."
 
-### 2022 - Efficiency Push
-> "Koomey's Law helps - new chips do more per watt. But the AI team wants 10x more chips."
+### Act 2: The Crash & Recovery (2001-2006)
 
-### 2023 - The Scaling Crisis
-> "Someone finally read Amdahl's Law. Turns out 100 racks don't make training 100x faster."
+#### 2001 - The Reckoning
+> "The bubble burst. Half your customers vanished overnight."
 
-### 2024 - Maturity
-> "You've seen it all: Moore, Dennard, Wirth, Amdahl. Now use them."
+#### 2002 - Survival Mode
+> "Do more with less. Consolidation is the word of the year."
 
-### 2025 - Victory?
-> "A decade of keeping up with the laws of computing. Legend."
+#### 2003 - AMD Rising
+> "Crimson Opteron arrives. 64-bit changes everything."
+
+#### 2004 - Virtualization
+> "One physical server, many virtual ones. Why didn't we do this sooner?"
+
+#### 2005 - Dual Core
+> "Two cores per socket. Moore's Law delivers again."
+
+#### 2006 - Dennard's End
+> "The engineers call it 'the power wall.' Clocks stopped scaling."
+
+### Act 3: The Cloud Era (2007-2014)
+
+#### 2007 - AWS Arrives
+> "Cloudscape offers servers by the hour. Is this the future?"
+
+#### 2008 - Crisis Mode
+> "The economy crashes. Budgets freeze. Make it work."
+
+#### 2009 - Recovery
+> "Nehalem arrives. Memory on-die. Everything gets faster."
+
+#### 2010 - Big Data
+> "Hadoop, MapReduce, 'data lakes.' Buzzwords everywhere."
+
+#### 2011 - Cloud Pressure
+> "Cloudscape is cheap. Your users are tempted."
+
+#### 2012 - SSD Revolution
+> "Flash storage changes the game. Spinning rust looks ancient."
+
+#### 2013 - Containers
+> "Docker launches. VMs suddenly feel heavy."
+
+#### 2014 - Kubernetes
+> "Container orchestration. The new virtualization."
+
+### Act 4: The Modern Era (2015-2020)
+
+#### 2015 - NVMe Arrives
+> "PCIe storage. Your SANs look like dinosaurs."
+
+#### 2016 - Crimson's Comeback
+> "EPYC is coming. Indigo won't have the market to itself."
+
+#### 2017 - Core Wars
+> "32 cores per socket. The server wars heat up."
+
+#### 2018 - Security Crisis
+> "Spectre. Meltdown. Patch everything. Performance tanks."
+
+#### 2019 - GPU Awakening
+> "ML teams want GPUs. Not one. Dozens."
+
+#### 2020 - Remote Everything
+> "The world works from home. Your datacenter is critical infrastructure."
+
+### Act 5: The AI Age (2021-2025)
+
+#### 2021 - AI Team Arrives
+> "They've formed an AI team. Brace yourself."
+
+#### 2022 - GPU Wars
+> "GPU allocations are now political. Everyone wants Emerald cards."
+
+#### 2023 - LLM Explosion
+> "Language models consume everything. Amdahl weeps."
+
+#### 2024 - Scale Crisis
+> "The AI team wants 100 racks for one model. Someone do the math."
+
+#### 2025 - Victory
+> "Three decades. From a T1 to a teraflop titan. Legend."
 
 ---
 
@@ -341,7 +468,7 @@ Keep from v2:
 
 Replace:
 - Team satisfaction → Queue overflow
-- Abstract "racks" → Visual 40U racks
+- Abstract "racks" → Visual 42U racks
 - Instant placement → Worker animations
 - Static view → Zoomable datacenter
 
@@ -351,3 +478,67 @@ Add:
 - Equipment catalog
 - Dock/staging area
 - Tetris-style queue
+
+---
+
+## Future DLC: The Cray Years (1976-1994)
+
+**Unlocked after:** Completing the main campaign (1995-2025)
+
+### Concept
+Go back to the era before standard racks. Manage a supercomputer center through the golden age of vector processing.
+
+### Timeline
+
+#### 1976 - The Beginning
+> "Seymour's masterpiece arrives. The Cray-1. 160 MFLOPS. It looks like a couch."
+
+#### 1982 - Vector Wars
+> "The X-MP: two processors, shared memory. Parallel computing begins."
+
+#### 1985 - Liquid Dreams
+> "The Cray-2. Four processors. Submerged in Fluorinert. 1.9 GFLOPS."
+
+#### 1988 - Competition
+> "The Y-MP arrives. But so do the Japanese. Fujitsu and NEC want the crown."
+
+#### 1993 - The End of an Era
+> "Seymour's gone independent. The T3D is the future. Massively parallel."
+
+### Unique Mechanics
+
+**No Standard Racks**
+- Custom installations for each machine
+- Liquid cooling from day one
+- Raised floor mandatory (cable management nightmare)
+
+**Floating Point Focus**
+- MFLOPS/GFLOPS as primary metric
+- Vector vs scalar workloads
+- Weather simulation, nuclear physics, oil exploration
+
+**Government Contracts**
+- Labs and agencies as customers
+- Security clearances required
+- Budget cycles tied to fiscal year
+
+### Equipment
+
+| Machine | Year | FLOPS | Power | Cooling | Cost |
+|---------|------|-------|-------|---------|------|
+| Cray-1 | 1976 | 160M | 115kW | Freon | $8M |
+| Cray X-MP | 1982 | 400M | 145kW | Freon | $15M |
+| Cray-2 | 1985 | 1.9G | 195kW | Fluorinert | $17M |
+| Cray Y-MP | 1988 | 2.7G | 150kW | Freon | $20M |
+| Cray C90 | 1991 | 16G | 200kW | Freon | $25M |
+| Cray T3D | 1993 | 150G | 350kW | Air+Liquid | $30M |
+
+### Story Arc
+Follow the rise and challenges of running a national lab computing center through:
+- The Cray dominance era
+- Japanese supercomputer competition
+- The shift from vector to parallel
+- Seymour Cray's departure and tragic end
+
+### Victory Condition
+> "1994. The T3D cluster hums. Massively parallel is the future. But those beautiful vector machines... they were something special."
