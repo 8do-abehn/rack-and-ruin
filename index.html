@@ -1653,6 +1653,7 @@
                             min="1"
                             max="15"
                             value="5"
+                            onkeydown="if (event.key === 'Enter') startGame();"
                             style="
                                 width: 60px;
                                 padding: 5px;
@@ -1662,8 +1663,8 @@
                             "
                         />
                         <span> years</span>
+                        <button class="btn primary" onclick="startGame()" style="margin-left: 10px">Go</button>
                     </div>
-                    <button class="btn primary" onclick="startGame()">Begin</button>
                 </div>
             </div>
         </div>
@@ -1703,7 +1704,7 @@
                 BASE_CAPACITY: 8,
                 AI_TEAM_ARRIVAL_DAY: 2190, // ~2021
                 PROGRESSIVE_REVEAL: {
-                    BUDGET_DAY: 91,
+                    BUDGET_DAY: 5,
                     HARDWARE_YEAR: 2,
                     EVENTS_YEAR: 3,
                 },
@@ -2788,6 +2789,8 @@
                     document.querySelector(`[data-years="${years}"]`).classList.add('selected');
                     document.getElementById('customYearsInput').style.display = 'none';
                     selectedCampaignYears = years;
+                    // Start immediately for preset options
+                    startGame();
                 }
             }
 
@@ -3593,7 +3596,7 @@
                             placeholder.className = 'rack';
                             placeholder.style.opacity = '0.2';
                             placeholder.style.cursor = 'not-allowed';
-                            placeholder.innerHTML = `<div class="rack-label" style="opacity:0.3">--</div>`;
+                            placeholder.innerHTML = '<div class="rack-label" style="opacity:0.3">--</div>';
                             floor.appendChild(placeholder);
                             continue;
                         }
@@ -3637,7 +3640,7 @@
                                     if (s < filledSlots) {
                                         slotsHtml += `<div class="rack-slot filled ${slotClass}"></div>`;
                                     } else {
-                                        slotsHtml += `<div class="rack-slot"></div>`;
+                                        slotsHtml += '<div class="rack-slot"></div>';
                                     }
                                 }
                                 rack.innerHTML = `
