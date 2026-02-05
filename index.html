@@ -314,6 +314,11 @@
                 color: var(--accent-amber);
             }
 
+            .request-revenue {
+                color: var(--budget-green);
+                font-size: 9px;
+            }
+
             .request-adjacency {
                 color: var(--accent-blue);
                 font-style: italic;
@@ -611,6 +616,18 @@
 
             .budget-amount.danger {
                 color: var(--budget-red);
+            }
+
+            .budget-row.revenue {
+                font-size: clamp(8px, 0.9vw, 10px);
+                opacity: 0.8;
+                border-top: 1px dashed var(--grid-line);
+                margin-top: 4px;
+                padding-top: 4px;
+            }
+
+            .revenue-amount {
+                color: var(--budget-green);
             }
 
             .budget-bar {
@@ -1628,6 +1645,14 @@
                                     <span>Year:</span>
                                     <span id="budgetYear">2015</span>
                                 </div>
+                                <div class="budget-row revenue">
+                                    <span>Rack revenue (YTD):</span>
+                                    <span class="revenue-amount" id="rackRevenue">$0</span>
+                                </div>
+                                <div class="budget-row revenue">
+                                    <span>Job revenue (YTD):</span>
+                                    <span class="revenue-amount" id="jobRevenue">$0</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1881,6 +1906,10 @@
                     { capacity: 150, cost: 80000, name: '150 Ton Chiller' },
                     { capacity: 300, cost: 150000, name: '300 Ton Plant' },
                 ],
+                // Revenue
+                RACK_REVENUE_PER_DAY: 100, // $ per occupied rack per day
+                JOB_REVENUE_BASE: 500, // base $ per job completed
+                JOB_REVENUE_PER_RACK: 200, // additional $ per rack in job
             };
 
             // ============================================
@@ -1936,6 +1965,10 @@
                     current: 500000,
                     yearly: 500000,
                     monthlyExpenses: 0,
+                    // Revenue tracking
+                    rackRevenue: 0, // $ from rack utilization this year
+                    jobRevenue: 0, // $ from job completions this year
+                    totalRevenue: 0, // lifetime total
                 },
 
                 // Staff
@@ -2657,6 +2690,16 @@
             }
 
             function processYearlyBudget() {
+                // Log last year's revenue before reset
+                const lastYearRevenue = gameState.budget.rackRevenue + gameState.budget.jobRevenue;
+                if (lastYearRevenue > 0) {
+                    logEvent(`Last year revenue: $${lastYearRevenue.toLocaleString()}`);
+                }
+
+                // Reset yearly revenue counters
+                gameState.budget.rackRevenue = 0;
+                gameState.budget.jobRevenue = 0;
+
                 // New year budget allocation
                 const yearMultiplier = 1 + (getGameYear() - 1) * 0.1; // 10% more each year
                 gameState.budget.yearly = Math.floor(CONFIG.BASE_BUDGET * yearMultiplier);
@@ -3089,6 +3132,16 @@
                     if (gameState.upgrades.coolingCapacity === undefined) {
                         gameState.upgrades.coolingCapacity = 0;
                     }
+                    // Ensure budget revenue properties exist for older saves
+                    if (gameState.budget.rackRevenue === undefined) {
+                        gameState.budget.rackRevenue = 0;
+                    }
+                    if (gameState.budget.jobRevenue === undefined) {
+                        gameState.budget.jobRevenue = 0;
+                    }
+                    if (gameState.budget.totalRevenue === undefined) {
+                        gameState.budget.totalRevenue = 0;
+                    }
 
                     return true;
                 } catch (e) {
@@ -3370,6 +3423,15 @@
                 gameState.capacityUsedToday = gameState.nextDayCapacityPenalty || 0;
                 gameState.nextDayCapacityPenalty = 0;
 
+                // Calculate daily rack revenue
+                const occupiedRacksCount = gameState.racks.filter(
+                    (r) => r !== null && r.status !== 'deprovisioning',
+                ).length;
+                const dailyRackRevenue = occupiedRacksCount * CONFIG.RACK_REVENUE_PER_DAY;
+                gameState.budget.current += dailyRackRevenue;
+                gameState.budget.rackRevenue += dailyRackRevenue;
+                gameState.budget.totalRevenue += dailyRackRevenue;
+
                 // Check for hardware failures (based on hardware generation)
                 if (getGameYear() >= 3) {
                     const failureChance = [0.02, 0.01, 0.005][gameState.upgrades.hardwareGen - 1] || 0.02;
@@ -3455,11 +3517,18 @@
                         });
                         gameState.jobsCompleted[job.team]++;
 
+                        // Job completion revenue
+                        const jobRevenue =
+                            CONFIG.JOB_REVENUE_BASE + job.rackIndices.length * CONFIG.JOB_REVENUE_PER_RACK;
+                        gameState.budget.current += jobRevenue;
+                        gameState.budget.jobRevenue += jobRevenue;
+                        gameState.budget.totalRevenue += jobRevenue;
+
                         // Completion bonus (AI team gives more)
                         const bonus = job.team === 'ai' ? 7 : 5;
                         adjustSatisfaction(job.team, bonus);
                         logEvent(
-                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+${bonus} ${job.team.toUpperCase()})`,
+                            `${job.name} completed - ${job.rackIndices.length} racks (+${bonus} ${job.team.toUpperCase()}, +$${jobRevenue.toLocaleString()})`,
                         );
                         playSound('success');
                     }
@@ -3908,6 +3977,10 @@
                         const chaoticNote = req.chaotic
                             ? '<br><span style="color:#ca8a2a;font-size:9px;">⚠ Specs may change</span>'
                             : '';
+                        // Calculate potential revenue for this job
+                        const jobRevenue = CONFIG.JOB_REVENUE_BASE + req.racks * CONFIG.JOB_REVENUE_PER_RACK;
+                        const rackRevenue = req.racks * req.duration * CONFIG.RACK_REVENUE_PER_DAY;
+                        const totalPotential = jobRevenue + rackRevenue;
                         return `
                 <div class="request-card ${req.isUrgent ? 'urgent' : ''} ${gameState.selectedRequest?.id === req.id ? 'selected' : ''}"
                      data-id="${req.id}">
@@ -3917,6 +3990,8 @@
                         ${req.racks} racks | ${req.duration} days | ${req.domain || 'general'}
                         <br>
                         <span class="request-deadline">Due: ${req.deadline - req.daysWaiting} days</span>
+                        <br>
+                        <span class="request-revenue">💰 ~$${totalPotential.toLocaleString()}</span>
                         ${sameRowNote}${chaoticNote}
                     </div>
                 </div>
@@ -4020,6 +4095,8 @@
                 const fill = document.getElementById('budgetFill');
                 const monthly = document.getElementById('monthlyCosts');
                 const yearEl = document.getElementById('budgetYear');
+                const rackRevenueEl = document.getElementById('rackRevenue');
+                const jobRevenueEl = document.getElementById('jobRevenue');
 
                 if (!remaining) return;
 
@@ -4033,6 +4110,14 @@
 
                 monthly.textContent = `$${calculateMonthlyExpenses().toLocaleString()}`;
                 yearEl.textContent = getCalendarYear();
+
+                // Revenue display
+                if (rackRevenueEl) {
+                    rackRevenueEl.textContent = `$${gameState.budget.rackRevenue.toLocaleString()}`;
+                }
+                if (jobRevenueEl) {
+                    jobRevenueEl.textContent = `$${gameState.budget.jobRevenue.toLocaleString()}`;
+                }
             }
 
             function calculateTFLOPS() {
