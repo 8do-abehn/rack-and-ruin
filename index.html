@@ -1824,6 +1824,10 @@
                             <h4>Marathon</h4>
                             <p>10 years • Epic</p>
                         </div>
+                        <div class="campaign-option" data-years="30" onclick="selectCampaign(30)">
+                            <h4>Legacy</h4>
+                            <p>30 years • 1995-2025</p>
+                        </div>
                         <div class="campaign-option" data-years="custom" onclick="selectCampaign('custom')">
                             <h4>Custom</h4>
                             <p>1-15 years</p>
@@ -1834,7 +1838,7 @@
                             type="number"
                             id="customYears"
                             min="1"
-                            max="15"
+                            max="30"
                             value="5"
                             onkeydown="if (event.key === 'Enter') startGame();"
                             style="
@@ -1874,9 +1878,9 @@
             // GAME CONFIGURATION
             // ============================================
             const CONFIG = {
-                START_YEAR: 2015,
+                START_YEAR: 1995,
                 DAYS_PER_YEAR: 365,
-                BASE_BUDGET: 500000,
+                BASE_BUDGET: 250000, // Lower starting budget for 1995
                 STAFF_SALARIES: {
                     network: 8000,
                     storage: 8000,
@@ -1885,7 +1889,7 @@
                 },
                 CAPACITY_PER_STAFF: 4,
                 BASE_CAPACITY: 8,
-                AI_TEAM_ARRIVAL_DAY: 2190, // ~2021
+                AI_TEAM_ARRIVAL_DAY: 9490, // Year 27 = 2021 (from 1995 start)
                 PROGRESSIVE_REVEAL: {
                     BUDGET_DAY: 5,
                     HARDWARE_YEAR: 2,
@@ -2553,21 +2557,43 @@
             // STORY MILESTONES
             // ============================================
             const storyMilestones = [
-                { day: 1, text: 'Welcome to 2015. Your datacenter awaits.' },
-                { day: 30, text: 'First month down. The requests keep coming.' },
-                { day: 90, text: 'Q1 complete. Management unlocks the budget panel.' },
-                { day: 180, text: "Half a year in. You're getting the hang of this." },
-                { day: 365, text: 'One year survived. Hardware upgrades now available.' },
-                { day: 500, text: 'The cloud vendors are circling. Keep teams happy.' },
-                { day: 730, text: 'Year 2 begins. Crimson EPYC shakes up the market.' },
-                { day: 1095, text: 'Year 3. Cloudscape and Skybridge ads everywhere.' },
-                { day: 1460, text: 'Year 4. GPU shortage hits. Crypto miners blamed.' },
-                { day: 1825, text: "Year 5. If you're still here, you're doing well." },
-                { day: 2190, text: 'Year 6. The AI boom begins. LLMs everywhere.' },
-                { day: 2555, text: "Year 7. Emerald can't make GPUs fast enough." },
-                { day: 2920, text: 'Year 8. Cloud or datacenter? The debate rages.' },
-                { day: 3285, text: "Year 9. You've seen it all now." },
-                { day: 3650, text: 'A decade. Legend.' },
+                // Act 1: The Web Era (1995-2000)
+                { day: 1, text: 'Welcome to 1995. Your first datacenter: 3 racks and a T1 line.' },
+                { day: 30, text: 'Netscape IPO. Everyone wants a website now.' },
+                { day: 365, text: '1996. E-commerce is the future, they say.' },
+                { day: 730, text: '1997. Pentium II arrives. Slot 1 architecture.' },
+                { day: 1095, text: '1998. Dotcom money flows. Build it and they will come.' },
+                { day: 1460, text: '1999. Y2K prep begins. Upgrade everything. NOW.' },
+                { day: 1825, text: '2000. Peak madness. Pets.com has more servers than customers.' },
+                // Act 2: Crash & Recovery (2001-2006)
+                { day: 2190, text: '2001. The bubble burst. Half your customers vanished.' },
+                { day: 2555, text: '2002. Survival mode. Do more with less.' },
+                { day: 2920, text: '2003. Crimson Opteron arrives. 64-bit is here.' },
+                { day: 3285, text: '2004. Virtualization! One server, many VMs.' },
+                { day: 3650, text: '2005. Dual-core CPUs. Moore delivers again.' },
+                { day: 4015, text: '2006. Dennard scaling ends. The power wall looms.' },
+                // Act 3: Cloud Era (2007-2014)
+                { day: 4380, text: '2007. Cloudscape launches. Servers by the hour?' },
+                { day: 4745, text: '2008. Economy crashes. Budgets freeze.' },
+                { day: 5110, text: '2009. Nehalem. Memory on-die. Everything faster.' },
+                { day: 5475, text: '2010. Big data! Hadoop clusters everywhere.' },
+                { day: 5840, text: '2011. Cloud pressure mounts. Your users are tempted.' },
+                { day: 6205, text: '2012. SSD revolution. Spinning rust looks ancient.' },
+                { day: 6570, text: '2013. Docker launches. Containers are the new VMs.' },
+                { day: 6935, text: '2014. Kubernetes. Container orchestration begins.' },
+                // Act 4: Modern Era (2015-2020)
+                { day: 7300, text: '2015. NVMe arrives. Your SANs look like dinosaurs.' },
+                { day: 7665, text: "2016. Crimson's EPYC coming. Indigo sweats." },
+                { day: 8030, text: '2017. 32 cores per socket. The server wars heat up.' },
+                { day: 8395, text: '2018. Spectre. Meltdown. Patch everything.' },
+                { day: 8760, text: '2019. GPU awakening. ML teams want dozens.' },
+                { day: 9125, text: '2020. Remote everything. You are critical infrastructure.' },
+                // Act 5: AI Age (2021-2025)
+                { day: 9490, text: 'The AI team has formed. Brace yourself.' },
+                { day: 9855, text: '2022. GPU wars. Everyone wants Emerald cards.' },
+                { day: 10220, text: '2023. LLMs devour capacity. Amdahl weeps.' },
+                { day: 10585, text: '2024. The AI team wants 100 racks for one model.' },
+                { day: 10950, text: '2025. Three decades. From T1 to teraflops. Legend.' },
             ];
 
             // ============================================
@@ -3023,7 +3049,7 @@
             function startGame() {
                 if (document.querySelector('[data-years="custom"]').classList.contains('selected')) {
                     selectedCampaignYears = parseInt(document.getElementById('customYears').value) || 5;
-                    selectedCampaignYears = Math.max(1, Math.min(15, selectedCampaignYears));
+                    selectedCampaignYears = Math.max(1, Math.min(30, selectedCampaignYears));
                 }
 
                 gameState.campaignYears = selectedCampaignYears;
