@@ -42,4 +42,4 @@ npm run format:check # CI formatting check
 
 ## License
 
-MIT
+[MIT](LICENSE)
