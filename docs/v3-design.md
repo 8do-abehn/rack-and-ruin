@@ -159,6 +159,54 @@ A time-management datacenter sim where computing laws drive the physics and stor
 
 ---
 
+## Revenue System
+
+### v1 Revenue Sources
+
+**Rack Utilization** - Paid per rack-day occupied
+```
+Base rate: $100/rack/day (1995)
+Scales with inflation/demand over time
+Premium for high-density racks
+```
+
+**Job Completion** - Flat fee per job completed
+```
+Fee scales with job size and complexity
+Bonus for on-time delivery
+Penalty for SLA misses (partial payment)
+```
+
+### Future Revenue Sources (Extensible)
+| Source | Description | Ties To |
+|--------|-------------|---------|
+| **Bandwidth** | Charge per GB egress | Metcalfe's Law |
+| **Compute hours** | TFLOPS-hours delivered | Moore's Law |
+| **Storage** | Per TB-month | Kryder's Law |
+| **Premium SLA** | Higher rates for guaranteed uptime | Risk/reward |
+| **Consulting** | Staff expertise sold to teams | Staff system |
+
+### Bandwidth (Future)
+Could be both a **constraint** and **revenue source**:
+
+**As Constraint:**
+```
+Starting (1995): T1 line (1.5 Mbps) - "The whole internet fits through a straw"
+Upgrades:
+  - T3 (45 Mbps) - 1998+
+  - OC-3 (155 Mbps) - 2001+
+  - 1 Gbps - 2005+
+  - 10 Gbps - 2010+
+  - 100 Gbps - 2018+
+```
+
+**As Revenue:**
+- Charge teams for data transfer
+- Egress fees (like cloud providers)
+- Ties into Metcalfe's Law - more connected = more valuable
+
+---
+
 ## Infrastructure Systems
 
 ### Power (DC-Level)
