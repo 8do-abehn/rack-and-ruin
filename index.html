@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="icon" type="image/svg+xml" href="favicon.svg">
+        <link rel="icon" type="image/svg+xml" href="favicon.svg" />
         <title>Rack & Ruin</title>
         <style>
             * {
@@ -552,7 +552,9 @@
                 border: 2px solid var(--grid-line);
                 padding: 1vh 1vw;
                 flex-shrink: 0;
-                transition: opacity 0.5s, max-height 0.5s;
+                transition:
+                    opacity 0.5s,
+                    max-height 0.5s;
             }
 
             .budget-panel.hidden {
@@ -620,7 +622,9 @@
 
             .budget-fill {
                 height: 100%;
-                transition: width 0.3s, background-color 0.3s;
+                transition:
+                    width 0.3s,
+                    background-color 0.3s;
             }
 
             /* Staff Panel */
@@ -629,7 +633,9 @@
                 border: 2px solid var(--grid-line);
                 padding: 1vh 1vw;
                 flex-shrink: 0;
-                transition: opacity 0.5s, max-height 0.5s;
+                transition:
+                    opacity 0.5s,
+                    max-height 0.5s;
             }
 
             .staff-panel.hidden {
@@ -691,7 +697,7 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                border: 1px solid rgba(0,0,0,0.2);
+                border: 1px solid rgba(0, 0, 0, 0.2);
             }
 
             .staff-figure .body {
@@ -702,7 +708,7 @@
                 left: 50%;
                 transform: translateX(-50%);
                 border-radius: 4px 4px 2px 2px;
-                border: 1px solid rgba(0,0,0,0.2);
+                border: 1px solid rgba(0, 0, 0, 0.2);
             }
 
             .staff-figure .legs {
@@ -722,10 +728,18 @@
                 border-radius: 0 0 2px 2px;
             }
 
-            .staff-figure.network .body { background: var(--staff-network); }
-            .staff-figure.storage .body { background: var(--staff-storage); }
-            .staff-figure.compute .body { background: var(--staff-compute); }
-            .staff-figure.generalist .body { background: var(--staff-generalist); }
+            .staff-figure.network .body {
+                background: var(--staff-network);
+            }
+            .staff-figure.storage .body {
+                background: var(--staff-storage);
+            }
+            .staff-figure.compute .body {
+                background: var(--staff-compute);
+            }
+            .staff-figure.generalist .body {
+                background: var(--staff-generalist);
+            }
 
             .staff-figure .specialty-badge {
                 position: absolute;
@@ -763,10 +777,18 @@
                 cursor: not-allowed;
             }
 
-            .staff-hire-btn.network { border-left: 3px solid var(--staff-network); }
-            .staff-hire-btn.storage { border-left: 3px solid var(--staff-storage); }
-            .staff-hire-btn.compute { border-left: 3px solid var(--staff-compute); }
-            .staff-hire-btn.generalist { border-left: 3px solid var(--staff-generalist); }
+            .staff-hire-btn.network {
+                border-left: 3px solid var(--staff-network);
+            }
+            .staff-hire-btn.storage {
+                border-left: 3px solid var(--staff-storage);
+            }
+            .staff-hire-btn.compute {
+                border-left: 3px solid var(--staff-compute);
+            }
+            .staff-hire-btn.generalist {
+                border-left: 3px solid var(--staff-generalist);
+            }
 
             /* Animated workers on datacenter floor */
             .datacenter {
@@ -780,7 +802,9 @@
                 height: 28px;
                 z-index: 50;
                 pointer-events: none;
-                transition: left 1.2s ease-in-out, top 1.2s ease-in-out;
+                transition:
+                    left 1.2s ease-in-out,
+                    top 1.2s ease-in-out;
             }
 
             .floor-worker .worker-head {
@@ -792,7 +816,7 @@
                 top: 0;
                 left: 50%;
                 transform: translateX(-50%);
-                border: 1px solid rgba(0,0,0,0.3);
+                border: 1px solid rgba(0, 0, 0, 0.3);
             }
 
             .floor-worker .worker-body {
@@ -803,7 +827,7 @@
                 left: 50%;
                 transform: translateX(-50%);
                 border-radius: 3px 3px 1px 1px;
-                border: 1px solid rgba(0,0,0,0.3);
+                border: 1px solid rgba(0, 0, 0, 0.3);
             }
 
             .floor-worker .worker-legs {
@@ -831,14 +855,28 @@
                 animation-delay: 0.125s;
             }
 
-            .floor-worker.network .worker-body { background: var(--staff-network); }
-            .floor-worker.storage .worker-body { background: var(--staff-storage); }
-            .floor-worker.compute .worker-body { background: var(--staff-compute); }
-            .floor-worker.generalist .worker-body { background: var(--staff-generalist); }
+            .floor-worker.network .worker-body {
+                background: var(--staff-network);
+            }
+            .floor-worker.storage .worker-body {
+                background: var(--staff-storage);
+            }
+            .floor-worker.compute .worker-body {
+                background: var(--staff-compute);
+            }
+            .floor-worker.generalist .worker-body {
+                background: var(--staff-generalist);
+            }
 
             @keyframes workerWalk {
-                0% { height: 6px; transform: translateY(0); }
-                100% { height: 4px; transform: translateY(2px); }
+                0% {
+                    height: 6px;
+                    transform: translateY(0);
+                }
+                100% {
+                    height: 4px;
+                    transform: translateY(2px);
+                }
             }
 
             /* Equipment being carried by worker */
@@ -850,7 +888,7 @@
                 width: 18px;
                 height: 10px;
                 border-radius: 2px;
-                border: 1px solid rgba(0,0,0,0.5);
+                border: 1px solid rgba(0, 0, 0, 0.5);
                 z-index: 1;
             }
 
@@ -925,7 +963,7 @@
 
             .rack-slot {
                 flex: 1;
-                background: rgba(0,0,0,0.4);
+                background: rgba(0, 0, 0, 0.4);
                 border-radius: 2px;
                 min-height: 6px;
                 max-height: 12px;
@@ -935,7 +973,7 @@
 
             .rack-slot.filled {
                 background: linear-gradient(180deg, #555 0%, #333 100%);
-                border: 1px solid rgba(255,255,255,0.15);
+                border: 1px solid rgba(255, 255, 255, 0.15);
             }
 
             .rack-slot.filled::before {
@@ -988,18 +1026,36 @@
             }
 
             @keyframes ledBlink {
-                0%, 92%, 100% { opacity: 1; }
-                96% { opacity: 0.2; }
+                0%,
+                92%,
+                100% {
+                    opacity: 1;
+                }
+                96% {
+                    opacity: 0.2;
+                }
             }
 
             @keyframes slotSlideIn {
-                0% { transform: translateX(-100%); opacity: 0; }
-                100% { transform: translateX(0); opacity: 1; }
+                0% {
+                    transform: translateX(-100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
             }
 
             @keyframes slotSlideOut {
-                0% { transform: translateX(0); opacity: 1; }
-                100% { transform: translateX(100%); opacity: 0; }
+                0% {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
             }
 
             /* Equipment staging area off-screen */
@@ -1019,7 +1075,7 @@
                 height: 10px;
                 background: linear-gradient(180deg, #555 0%, #333 100%);
                 border-radius: 2px;
-                border: 1px solid rgba(255,255,255,0.2);
+                border: 1px solid rgba(255, 255, 255, 0.2);
             }
 
             /* Decommission area */
@@ -1037,7 +1093,9 @@
                 border: 2px solid var(--grid-line);
                 padding: 1vh 1vw;
                 flex-shrink: 0;
-                transition: opacity 0.5s, max-height 0.5s;
+                transition:
+                    opacity 0.5s,
+                    max-height 0.5s;
             }
 
             .hardware-panel.hidden {
@@ -1110,7 +1168,9 @@
                 font-style: italic;
                 opacity: 0;
                 transform: translateX(-20px);
-                transition: opacity 0.5s, transform 0.5s;
+                transition:
+                    opacity 0.5s,
+                    transform 0.5s;
                 display: none;
             }
 
@@ -1325,7 +1385,9 @@
 
         <div class="container">
             <header>
-                <div class="title">Rack & Ruin <span style="font-size:10px;opacity:0.5;font-weight:normal;">v2.0.0</span></div>
+                <div class="title">
+                    Rack & Ruin <span style="font-size: 10px; opacity: 0.5; font-weight: normal">v2.0.0</span>
+                </div>
                 <div class="header-center">
                     <div class="date-display" id="dateDisplay">January 1, 2015</div>
                     <div class="day-counter" id="dayCounter">Day 1 / 3650</div>
@@ -1334,7 +1396,17 @@
                     <div class="audio-controls">
                         <button class="audio-btn" id="musicToggle" title="Toggle Music">♪</button>
                         <button class="audio-btn" id="sfxToggle" title="Toggle Sound Effects">🔊</button>
-                        <a href="https://github.com/8do-abehn/rack-and-ruin" target="_blank" class="audio-btn" title="View on GitHub" style="text-decoration:none;display:flex;align-items:center;"><svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+                        <a
+                            href="https://github.com/8do-abehn/rack-and-ruin"
+                            target="_blank"
+                            class="audio-btn"
+                            title="View on GitHub"
+                            style="text-decoration: none; display: flex; align-items: center"
+                            ><svg height="16" width="16" viewBox="0 0 16 16" fill="currentColor">
+                                <path
+                                    d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                                /></svg
+                        ></a>
                     </div>
                 </div>
             </header>
@@ -1408,11 +1480,10 @@
                     <div class="capacity-panel">
                         <h2>Staff</h2>
                         <div class="capacity-info">
-                            <div id="staffBreakdown">
-                                <span style="color:var(--staff-generalist)">●</span> 2 Base
-                            </div>
-                            <div style="margin-top:4px;padding-top:4px;border-top:1px dashed var(--grid-line);">
-                                Capacity: <span class="capacity-used" id="capacityUsed">0</span> / <span id="maxCapacityDisplay">8</span> racks/day
+                            <div id="staffBreakdown"><span style="color: var(--staff-generalist)">●</span> 2 Base</div>
+                            <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--grid-line)">
+                                Capacity: <span class="capacity-used" id="capacityUsed">0</span> /
+                                <span id="maxCapacityDisplay">8</span> racks/day
                             </div>
                             <div>Depro queue: <span id="deproQueue">0</span></div>
                         </div>
@@ -1423,7 +1494,11 @@
                         <h2 onclick="togglePanel('budgetPanel')">Budget</h2>
                         <div class="budget-content">
                             <div class="budget-bar">
-                                <div class="budget-fill" id="budgetFill" style="width: 100%; background: var(--budget-green);"></div>
+                                <div
+                                    class="budget-fill"
+                                    id="budgetFill"
+                                    style="width: 100%; background: var(--budget-green)"
+                                ></div>
                             </div>
                             <div class="budget-info">
                                 <div class="budget-row">
@@ -1450,10 +1525,18 @@
                                 <!-- Staff figures rendered by JS -->
                             </div>
                             <div class="staff-hire-buttons" id="staffHireButtons">
-                                <button class="staff-hire-btn network" onclick="hireStaff('network')">+Network $8k/mo</button>
-                                <button class="staff-hire-btn storage" onclick="hireStaff('storage')">+Storage $8k/mo</button>
-                                <button class="staff-hire-btn compute" onclick="hireStaff('compute')">+Compute $8k/mo</button>
-                                <button class="staff-hire-btn generalist" onclick="hireStaff('generalist')">+General $6k/mo</button>
+                                <button class="staff-hire-btn network" onclick="hireStaff('network')">
+                                    +Network $8k/mo
+                                </button>
+                                <button class="staff-hire-btn storage" onclick="hireStaff('storage')">
+                                    +Storage $8k/mo
+                                </button>
+                                <button class="staff-hire-btn compute" onclick="hireStaff('compute')">
+                                    +Compute $8k/mo
+                                </button>
+                                <button class="staff-hire-btn generalist" onclick="hireStaff('generalist')">
+                                    +General $6k/mo
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1482,7 +1565,15 @@
                 <h2>GAME OVER</h2>
                 <p id="gameOverReason">A team's satisfaction dropped below 20%.</p>
                 <p id="gameOverStats"></p>
-                <button class="btn primary" onclick="clearSave(); location.reload()">Try Again</button>
+                <button
+                    class="btn primary"
+                    onclick="
+                        clearSave();
+                        location.reload();
+                    "
+                >
+                    Try Again
+                </button>
             </div>
         </div>
 
@@ -1492,7 +1583,15 @@
                 <h2>VICTORY!</h2>
                 <p>You survived a decade of datacenter management!</p>
                 <p id="victoryStats"></p>
-                <button class="btn primary" onclick="clearSave(); location.reload()">Play Again</button>
+                <button
+                    class="btn primary"
+                    onclick="
+                        clearSave();
+                        location.reload();
+                    "
+                >
+                    Play Again
+                </button>
             </div>
         </div>
 
@@ -1511,10 +1610,18 @@
                 <h2>RACK & RUIN</h2>
 
                 <!-- Continue saved game section -->
-                <div id="continueSection" style="display: none; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed var(--grid-line);">
+                <div
+                    id="continueSection"
+                    style="
+                        display: none;
+                        margin-bottom: 20px;
+                        padding-bottom: 20px;
+                        border-bottom: 1px dashed var(--grid-line);
+                    "
+                >
                     <p>Continue your saved game?</p>
-                    <p id="saveInfo" style="font-size: 11px; opacity: 0.7; margin: 10px 0;"></p>
-                    <button class="btn primary" onclick="continueGame()" style="margin-right: 10px;">Continue</button>
+                    <p id="saveInfo" style="font-size: 11px; opacity: 0.7; margin: 10px 0"></p>
+                    <button class="btn primary" onclick="continueGame()" style="margin-right: 10px">Continue</button>
                     <button class="btn" onclick="newGameConfirm()">New Game</button>
                 </div>
 
@@ -1539,8 +1646,21 @@
                             <p>1-15 years</p>
                         </div>
                     </div>
-                    <div id="customYearsInput" style="display: none; margin-bottom: 15px;">
-                        <input type="number" id="customYears" min="1" max="15" value="5" style="width: 60px; padding: 5px; background: var(--bg-color); border: 1px solid var(--grid-line); color: var(--text-color);">
+                    <div id="customYearsInput" style="display: none; margin-bottom: 15px">
+                        <input
+                            type="number"
+                            id="customYears"
+                            min="1"
+                            max="15"
+                            value="5"
+                            style="
+                                width: 60px;
+                                padding: 5px;
+                                background: var(--bg-color);
+                                border: 1px solid var(--grid-line);
+                                color: var(--text-color);
+                            "
+                        />
                         <span> years</span>
                     </div>
                     <button class="btn primary" onclick="startGame()">Begin</button>
@@ -1551,9 +1671,11 @@
         <!-- Cloud Proposal Modal -->
         <div class="modal-overlay" id="cloudProposalModal">
             <div class="modal">
-                <h2 style="color: var(--danger);">CLOUD PROPOSAL</h2>
+                <h2 style="color: var(--danger)">CLOUD PROPOSAL</h2>
                 <p id="cloudProposalText">A team is formally proposing to migrate to the cloud.</p>
-                <p style="font-size: 12px; opacity: 0.8; margin-top: 10px;">Raise their satisfaction above 30% quickly, or they'll leave!</p>
+                <p style="font-size: 12px; opacity: 0.8; margin-top: 10px">
+                    Raise their satisfaction above 30% quickly, or they'll leave!
+                </p>
                 <button class="btn primary" onclick="closeCloudProposal()">Understood</button>
             </div>
         </div>
@@ -1575,7 +1697,7 @@
                     network: 8000,
                     storage: 8000,
                     compute: 8000,
-                    generalist: 6000
+                    generalist: 6000,
                 },
                 CAPACITY_PER_STAFF: 4,
                 BASE_CAPACITY: 8,
@@ -1583,8 +1705,8 @@
                 PROGRESSIVE_REVEAL: {
                     BUDGET_DAY: 91,
                     HARDWARE_YEAR: 2,
-                    EVENTS_YEAR: 3
-                }
+                    EVENTS_YEAR: 3,
+                },
             };
 
             // ============================================
@@ -1603,7 +1725,7 @@
                     rd: 60,
                     sales: 60,
                     benchmark: 60,
-                    ai: 60
+                    ai: 60,
                 },
 
                 // Start with 9 racks (3x3), expandable to 15+
@@ -1639,7 +1761,7 @@
                 budget: {
                     current: 500000,
                     yearly: 500000,
-                    monthlyExpenses: 0
+                    monthlyExpenses: 0,
                 },
 
                 // Staff
@@ -1647,10 +1769,10 @@
 
                 // Hardware upgrades purchased
                 upgrades: {
-                    rackExpansion: 0,      // 0-2 (each adds 3 racks)
-                    provisioningSpeed: 0,  // 0-2 (each reduces prov time)
-                    capacityBoost: 0,      // 0-2 (each adds +2 capacity)
-                    hardwareGen: 1         // 1-3 (reduces failure chance)
+                    rackExpansion: 0, // 0-2 (each adds 3 racks)
+                    provisioningSpeed: 0, // 0-2 (each reduces prov time)
+                    capacityBoost: 0, // 0-2 (each adds +2 capacity)
+                    hardwareGen: 1, // 1-3 (reduces failure chance)
                 },
 
                 // Rack specializations
@@ -1664,7 +1786,7 @@
                     rd: { level40: false, level30: false },
                     sales: { level40: false, level30: false },
                     benchmark: { level40: false, level30: false },
-                    ai: { level40: false, level30: false }
+                    ai: { level40: false, level30: false },
                 },
 
                 // Story milestones triggered
@@ -1673,11 +1795,11 @@
                 // Audio settings
                 audio: {
                     musicEnabled: true,
-                    sfxEnabled: true
+                    sfxEnabled: true,
                 },
 
                 // Events that have fired this year
-                eventsThisYear: []
+                eventsThisYear: [],
             };
 
             // ============================================
@@ -1691,64 +1813,337 @@
             const requestTemplates = {
                 rd: [
                     // Era 1: 2015-2017 (Early Days)
-                    { name: 'DDR4 validation cluster', racks: 4, duration: 14, adjacency: true, era: 1, domain: 'compute' },
-                    { name: '100GbE integration test', racks: 3, duration: 12, adjacency: true, era: 1, domain: 'network' },
-                    { name: 'Broadwell-EP firmware update', racks: 3, duration: 21, adjacency: false, era: 1, domain: 'compute' },
-                    { name: 'NVMe driver validation', racks: 2, duration: 10, adjacency: false, era: 1, domain: 'storage' },
-                    { name: 'Skylake BIOS testing', racks: 4, duration: 18, adjacency: false, era: 1, domain: 'compute' },
+                    {
+                        name: 'DDR4 validation cluster',
+                        racks: 4,
+                        duration: 14,
+                        adjacency: true,
+                        era: 1,
+                        domain: 'compute',
+                    },
+                    {
+                        name: '100GbE integration test',
+                        racks: 3,
+                        duration: 12,
+                        adjacency: true,
+                        era: 1,
+                        domain: 'network',
+                    },
+                    {
+                        name: 'Broadwell-EP firmware update',
+                        racks: 3,
+                        duration: 21,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'NVMe driver validation',
+                        racks: 2,
+                        duration: 10,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'storage',
+                    },
+                    {
+                        name: 'Skylake BIOS testing',
+                        racks: 4,
+                        duration: 18,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'compute',
+                    },
                     // Era 2: 2018-2020 (Growth Phase)
-                    { name: 'EPYC Naples validation', racks: 5, duration: 21, adjacency: true, era: 2, domain: 'compute' },
-                    { name: 'InfiniBand fabric test', racks: 4, duration: 10, adjacency: true, era: 2, domain: 'network' },
-                    { name: 'PCIe 4.0 compatibility', racks: 2, duration: 7, adjacency: false, era: 2, domain: 'compute' },
-                    { name: 'Optane memory testing', racks: 3, duration: 14, adjacency: false, era: 2, domain: 'storage' },
-                    { name: 'Crimson EPYC Rome test', racks: 4, duration: 16, adjacency: true, era: 2, domain: 'compute' },
+                    {
+                        name: 'EPYC Naples validation',
+                        racks: 5,
+                        duration: 21,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'InfiniBand fabric test',
+                        racks: 4,
+                        duration: 10,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'network',
+                    },
+                    {
+                        name: 'PCIe 4.0 compatibility',
+                        racks: 2,
+                        duration: 7,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Optane memory testing',
+                        racks: 3,
+                        duration: 14,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'storage',
+                    },
+                    {
+                        name: 'Crimson EPYC Rome test',
+                        racks: 4,
+                        duration: 16,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'compute',
+                    },
                     // Era 3: 2021-2023 (AI Boom)
-                    { name: 'DDR5 validation suite', racks: 4, duration: 14, adjacency: true, era: 3, domain: 'compute' },
-                    { name: 'PCIe 5.0 switch testing', racks: 3, duration: 10, adjacency: true, era: 3, domain: 'network' },
+                    {
+                        name: 'DDR5 validation suite',
+                        racks: 4,
+                        duration: 14,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'PCIe 5.0 switch testing',
+                        racks: 3,
+                        duration: 10,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'network',
+                    },
                     { name: 'CXL memory pooling', racks: 5, duration: 21, adjacency: true, era: 3, domain: 'storage' },
                     // Era 4: 2024+ (Late Game)
-                    { name: 'Emerald H100 validation', racks: 6, duration: 21, adjacency: true, era: 4, domain: 'compute' },
-                    { name: '400GbE fabric testing', racks: 4, duration: 14, adjacency: true, era: 4, domain: 'network' },
+                    {
+                        name: 'Emerald H100 validation',
+                        racks: 6,
+                        duration: 21,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'compute',
+                    },
+                    {
+                        name: '400GbE fabric testing',
+                        racks: 4,
+                        duration: 14,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'network',
+                    },
                 ],
                 sales: [
                     // Sales demos never require adjacency - clients across all eras
                     { name: 'ORNL demo', racks: 2, duration: 5, adjacency: false, era: 1, domain: 'compute' },
-                    { name: 'Stanford AI showcase', racks: 3, duration: 7, adjacency: false, era: 1, domain: 'compute' },
-                    { name: 'NASA simulation demo', racks: 2, duration: 5, adjacency: false, era: 1, domain: 'compute' },
-                    { name: 'Nexus Automotive POC', racks: 2, duration: 7, adjacency: false, era: 2, domain: 'compute' },
-                    { name: 'Stratos Aerospace CFD demo', racks: 3, duration: 5, adjacency: false, era: 2, domain: 'compute' },
-                    { name: 'MIT research preview', racks: 2, duration: 7, adjacency: false, era: 1, domain: 'compute' },
-                    { name: 'LANL competitive eval', racks: 3, duration: 10, adjacency: false, era: 2, domain: 'compute' },
-                    { name: 'Helix Genomics pipeline', racks: 2, duration: 5, adjacency: false, era: 2, domain: 'storage' },
-                    { name: 'Cloudscape migration POC', racks: 4, duration: 10, adjacency: false, era: 3, domain: 'network' },
-                    { name: 'Skybridge hybrid demo', racks: 3, duration: 7, adjacency: false, era: 3, domain: 'network' },
-                    { name: 'FinTech AI trading demo', racks: 4, duration: 7, adjacency: false, era: 4, domain: 'compute' },
+                    {
+                        name: 'Stanford AI showcase',
+                        racks: 3,
+                        duration: 7,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'NASA simulation demo',
+                        racks: 2,
+                        duration: 5,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Nexus Automotive POC',
+                        racks: 2,
+                        duration: 7,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Stratos Aerospace CFD demo',
+                        racks: 3,
+                        duration: 5,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'MIT research preview',
+                        racks: 2,
+                        duration: 7,
+                        adjacency: false,
+                        era: 1,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'LANL competitive eval',
+                        racks: 3,
+                        duration: 10,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Helix Genomics pipeline',
+                        racks: 2,
+                        duration: 5,
+                        adjacency: false,
+                        era: 2,
+                        domain: 'storage',
+                    },
+                    {
+                        name: 'Cloudscape migration POC',
+                        racks: 4,
+                        duration: 10,
+                        adjacency: false,
+                        era: 3,
+                        domain: 'network',
+                    },
+                    {
+                        name: 'Skybridge hybrid demo',
+                        racks: 3,
+                        duration: 7,
+                        adjacency: false,
+                        era: 3,
+                        domain: 'network',
+                    },
+                    {
+                        name: 'FinTech AI trading demo',
+                        racks: 4,
+                        duration: 7,
+                        adjacency: false,
+                        era: 4,
+                        domain: 'compute',
+                    },
                 ],
                 benchmark: [
                     // Benchmarks ALWAYS require adjacency - results invalid otherwise
-                    { name: 'Indigo vs Crimson comparison', racks: 6, duration: 14, adjacency: true, era: 1, domain: 'compute' },
+                    {
+                        name: 'Indigo vs Crimson comparison',
+                        racks: 6,
+                        duration: 14,
+                        adjacency: true,
+                        era: 1,
+                        domain: 'compute',
+                    },
                     { name: 'GPU compute scaling', racks: 4, duration: 10, adjacency: true, era: 1, domain: 'compute' },
-                    { name: 'Storage throughput test', racks: 5, duration: 12, adjacency: true, era: 1, domain: 'storage' },
-                    { name: 'Network latency analysis', racks: 4, duration: 7, adjacency: true, era: 1, domain: 'network' },
-                    { name: 'Memory bandwidth study', racks: 4, duration: 10, adjacency: true, era: 2, domain: 'compute' },
-                    { name: 'Power efficiency audit', racks: 6, duration: 14, adjacency: true, era: 2, domain: 'compute' },
-                    { name: 'MPI scaling benchmark', racks: 5, duration: 10, adjacency: true, era: 2, domain: 'network' },
+                    {
+                        name: 'Storage throughput test',
+                        racks: 5,
+                        duration: 12,
+                        adjacency: true,
+                        era: 1,
+                        domain: 'storage',
+                    },
+                    {
+                        name: 'Network latency analysis',
+                        racks: 4,
+                        duration: 7,
+                        adjacency: true,
+                        era: 1,
+                        domain: 'network',
+                    },
+                    {
+                        name: 'Memory bandwidth study',
+                        racks: 4,
+                        duration: 10,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Power efficiency audit',
+                        racks: 6,
+                        duration: 14,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'MPI scaling benchmark',
+                        racks: 5,
+                        duration: 10,
+                        adjacency: true,
+                        era: 2,
+                        domain: 'network',
+                    },
                     { name: 'LINPACK validation', racks: 6, duration: 7, adjacency: true, era: 1, domain: 'compute' },
-                    { name: 'MLPerf inference test', racks: 5, duration: 12, adjacency: true, era: 3, domain: 'compute' },
-                    { name: 'NVLink bandwidth test', racks: 4, duration: 8, adjacency: true, era: 4, domain: 'network' },
+                    {
+                        name: 'MLPerf inference test',
+                        racks: 5,
+                        duration: 12,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'NVLink bandwidth test',
+                        racks: 4,
+                        duration: 8,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'network',
+                    },
                 ],
                 ai: [
                     // AI team - GPU heavy, always adjacent, chaotic
-                    { name: 'LLM training cluster', racks: 6, duration: 28, adjacency: true, era: 3, domain: 'compute' },
+                    {
+                        name: 'LLM training cluster',
+                        racks: 6,
+                        duration: 28,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'compute',
+                    },
                     { name: 'GPT fine-tuning run', racks: 4, duration: 14, adjacency: true, era: 3, domain: 'compute' },
-                    { name: 'Diffusion model training', racks: 5, duration: 21, adjacency: true, era: 3, domain: 'compute' },
+                    {
+                        name: 'Diffusion model training',
+                        racks: 5,
+                        duration: 21,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'compute',
+                    },
                     { name: 'Embedding generation', racks: 3, duration: 7, adjacency: true, era: 3, domain: 'storage' },
-                    { name: 'Model checkpoint storage', racks: 4, duration: 10, adjacency: false, era: 3, domain: 'storage' },
-                    { name: 'Multi-GPU inference test', racks: 4, duration: 7, adjacency: true, era: 4, domain: 'compute' },
-                    { name: 'AGI research cluster', racks: 8, duration: 35, adjacency: true, era: 4, domain: 'compute' },
-                    { name: 'Vision model training', racks: 5, duration: 18, adjacency: true, era: 3, domain: 'compute' },
-                    { name: 'Reinforcement learning', racks: 4, duration: 14, adjacency: true, era: 4, domain: 'compute' },
-                ]
+                    {
+                        name: 'Model checkpoint storage',
+                        racks: 4,
+                        duration: 10,
+                        adjacency: false,
+                        era: 3,
+                        domain: 'storage',
+                    },
+                    {
+                        name: 'Multi-GPU inference test',
+                        racks: 4,
+                        duration: 7,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'AGI research cluster',
+                        racks: 8,
+                        duration: 35,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Vision model training',
+                        racks: 5,
+                        duration: 18,
+                        adjacency: true,
+                        era: 3,
+                        domain: 'compute',
+                    },
+                    {
+                        name: 'Reinforcement learning',
+                        racks: 4,
+                        duration: 14,
+                        adjacency: true,
+                        era: 4,
+                        domain: 'compute',
+                    },
+                ],
             };
 
             // ============================================
@@ -1757,20 +2152,20 @@
             const upgradeDefinitions = {
                 rackExpansion: [
                     { name: 'Rack Row 4', cost: 75000, description: '+3 racks (12 total)' },
-                    { name: 'Rack Row 5', cost: 100000, description: '+3 racks (15 total)' }
+                    { name: 'Rack Row 5', cost: 100000, description: '+3 racks (15 total)' },
                 ],
                 provisioningSpeed: [
                     { name: 'Automation Scripts', cost: 30000, description: 'Faster provisioning' },
-                    { name: 'Infrastructure as Code', cost: 50000, description: 'Instant provisioning' }
+                    { name: 'Infrastructure as Code', cost: 50000, description: 'Instant provisioning' },
                 ],
                 capacityBoost: [
                     { name: 'Junior Hires', cost: 40000, description: '+2 daily capacity' },
-                    { name: 'Shift Coverage', cost: 60000, description: '+2 daily capacity' }
+                    { name: 'Shift Coverage', cost: 60000, description: '+2 daily capacity' },
                 ],
                 hardwareGen: [
                     { name: 'Gen 2 Hardware', cost: 80000, description: 'Reduced failures' },
-                    { name: 'Gen 3 Hardware', cost: 120000, description: 'Minimal failures' }
-                ]
+                    { name: 'Gen 3 Hardware', cost: 120000, description: 'Minimal failures' },
+                ],
             };
 
             // ============================================
@@ -1785,17 +2180,19 @@
                     type: 'negative',
                     minYear: 3,
                     effect: (gs) => {
-                        const occupiedRacks = gs.racks.map((r, i) => r && r.status !== 'deprovisioning' ? i : -1).filter(i => i >= 0);
+                        const occupiedRacks = gs.racks
+                            .map((r, i) => (r && r.status !== 'deprovisioning' ? i : -1))
+                            .filter((i) => i >= 0);
                         if (occupiedRacks.length > 0) {
                             const rackIdx = randomChoice(occupiedRacks);
                             const job = gs.racks[rackIdx];
                             if (job) {
                                 adjustSatisfaction(job.team, -10);
-                                return `Rack ${Math.floor(rackIdx/5)+1}-${(rackIdx%5)+1} failed! ${job.name} interrupted. (-10 ${job.team.toUpperCase()})`;
+                                return `Rack ${Math.floor(rackIdx / 5) + 1}-${(rackIdx % 5) + 1} failed! ${job.name} interrupted. (-10 ${job.team.toUpperCase()})`;
                             }
                         }
                         return 'A spare rack failed. No jobs affected.';
-                    }
+                    },
                 },
                 {
                     id: 'cooling_malfunction',
@@ -1804,12 +2201,12 @@
                     type: 'negative',
                     minYear: 3,
                     effect: (gs) => {
-                        Object.keys(gs.satisfaction).forEach(team => {
+                        Object.keys(gs.satisfaction).forEach((team) => {
                             if (team === 'ai' && !gs.aiTeamJoined) return;
                             adjustSatisfaction(team, -5);
                         });
                         return 'Cooling malfunction! All teams -5 satisfaction.';
-                    }
+                    },
                 },
                 {
                     id: 'power_spike',
@@ -1820,7 +2217,7 @@
                     effect: (gs) => {
                         gs.capacityUsedToday = Math.min(gs.maxCapacity, gs.capacityUsedToday + 4);
                         return 'Power spike! Lost 4 capacity today dealing with resets.';
-                    }
+                    },
                 },
                 // Opportunities (positive)
                 {
@@ -1833,7 +2230,7 @@
                         const bonus = 25000 + Math.floor(Math.random() * 25000);
                         gs.budget.current += bonus;
                         return `Budget surplus! +$${bonus.toLocaleString()}`;
-                    }
+                    },
                 },
                 {
                     id: 'skilled_applicant',
@@ -1844,7 +2241,7 @@
                     effect: (gs) => {
                         gs.discountedHire = true;
                         return 'Talented applicant available! Next hire at 50% salary for first year.';
-                    }
+                    },
                 },
                 {
                     id: 'hardware_discount',
@@ -1855,7 +2252,7 @@
                     effect: (gs) => {
                         gs.upgradeDiscount = 0.3;
                         return 'Hardware vendor sale! Upgrades 30% off this month.';
-                    }
+                    },
                 },
                 // External Crises
                 {
@@ -1867,7 +2264,7 @@
                     effect: (gs) => {
                         gs.capacityUsedToday = gs.maxCapacity;
                         return 'Security audit! All capacity used for compliance today.';
-                    }
+                    },
                 },
                 {
                     id: 'vendor_delay',
@@ -1878,7 +2275,7 @@
                     effect: (gs) => {
                         gs.nextDayCapacityPenalty = 4;
                         return 'Vendor delay! -4 capacity tomorrow.';
-                    }
+                    },
                 },
                 // Tech Milestones
                 {
@@ -1888,7 +2285,7 @@
                     type: 'milestone',
                     triggerDay: 1,
                     oneTime: true,
-                    effect: () => 'DDR4 era begins!'
+                    effect: () => 'DDR4 era begins!',
                 },
                 {
                     id: 'epyc_launch',
@@ -1897,7 +2294,7 @@
                     type: 'milestone',
                     triggerDay: 730, // ~2017
                     oneTime: true,
-                    effect: () => 'Crimson EPYC processors now available!'
+                    effect: () => 'Crimson EPYC processors now available!',
                 },
                 {
                     id: 'cloud_pressure',
@@ -1906,7 +2303,7 @@
                     type: 'milestone',
                     triggerDay: 1095, // ~2018
                     oneTime: true,
-                    effect: () => 'Cloud providers growing. Keep teams happy!'
+                    effect: () => 'Cloud providers growing. Keep teams happy!',
                 },
                 {
                     id: 'gpu_shortage',
@@ -1918,7 +2315,7 @@
                     effect: (gs) => {
                         gs.gpuShortage = true;
                         return 'GPU shortage! AI team requests may increase.';
-                    }
+                    },
                 },
                 {
                     id: 'ai_team_arrives',
@@ -1931,8 +2328,8 @@
                         gs.aiTeamJoined = true;
                         document.getElementById('aiSatisfactionRow').classList.remove('hidden');
                         return 'AI/ML team has joined! Expect demanding GPU workloads.';
-                    }
-                }
+                    },
+                },
             ];
 
             // ============================================
@@ -1942,18 +2339,18 @@
                 { day: 1, text: 'Welcome to 2015. Your datacenter awaits.' },
                 { day: 30, text: 'First month down. The requests keep coming.' },
                 { day: 90, text: 'Q1 complete. Management unlocks the budget panel.' },
-                { day: 180, text: 'Half a year in. You\'re getting the hang of this.' },
+                { day: 180, text: "Half a year in. You're getting the hang of this." },
                 { day: 365, text: 'One year survived. Hardware upgrades now available.' },
                 { day: 500, text: 'The cloud vendors are circling. Keep teams happy.' },
                 { day: 730, text: 'Year 2 begins. Crimson EPYC shakes up the market.' },
                 { day: 1095, text: 'Year 3. Cloudscape and Skybridge ads everywhere.' },
                 { day: 1460, text: 'Year 4. GPU shortage hits. Crypto miners blamed.' },
-                { day: 1825, text: 'Year 5. If you\'re still here, you\'re doing well.' },
+                { day: 1825, text: "Year 5. If you're still here, you're doing well." },
                 { day: 2190, text: 'Year 6. The AI boom begins. LLMs everywhere.' },
-                { day: 2555, text: 'Year 7. Emerald can\'t make GPUs fast enough.' },
+                { day: 2555, text: "Year 7. Emerald can't make GPUs fast enough." },
                 { day: 2920, text: 'Year 8. Cloud or datacenter? The debate rages.' },
-                { day: 3285, text: 'Year 9. You\'ve seen it all now.' },
-                { day: 3650, text: 'A decade. Legend.' }
+                { day: 3285, text: "Year 9. You've seen it all now." },
+                { day: 3650, text: 'A decade. Legend.' },
             ];
 
             // ============================================
@@ -1965,8 +2362,18 @@
                 currentDate.setDate(startDate.getDate() + day - 1);
 
                 const months = [
-                    'January', 'February', 'March', 'April', 'May', 'June',
-                    'July', 'August', 'September', 'October', 'November', 'December'
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December',
                 ];
 
                 return `${months[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
@@ -2031,7 +2438,7 @@
             // ============================================
             function calculateMonthlyExpenses() {
                 let total = 0;
-                gameState.staff.forEach(s => {
+                gameState.staff.forEach((s) => {
                     total += CONFIG.STAFF_SALARIES[s.specialty];
                 });
                 return total;
@@ -2051,8 +2458,8 @@
                     logEvent('BUDGET CRISIS: Cannot afford staff!');
                     // Fire most expensive staff member
                     if (gameState.staff.length > 0) {
-                        gameState.staff.sort((a, b) =>
-                            CONFIG.STAFF_SALARIES[b.specialty] - CONFIG.STAFF_SALARIES[a.specialty]
+                        gameState.staff.sort(
+                            (a, b) => CONFIG.STAFF_SALARIES[b.specialty] - CONFIG.STAFF_SALARIES[a.specialty],
                         );
                         const fired = gameState.staff.shift();
                         logEvent(`${fired.specialty} specialist left (budget cuts)`);
@@ -2094,7 +2501,7 @@
                 const newStaff = {
                     id: Date.now(),
                     specialty: specialty,
-                    hiredDay: gameState.day
+                    hiredDay: gameState.day,
                 };
 
                 gameState.staff.push(newStaff);
@@ -2110,7 +2517,7 @@
             }
 
             function fireStaff(staffId) {
-                const idx = gameState.staff.findIndex(s => s.id === staffId);
+                const idx = gameState.staff.findIndex((s) => s.id === staffId);
                 if (idx >= 0) {
                     const staff = gameState.staff[idx];
                     gameState.staff.splice(idx, 1);
@@ -2141,7 +2548,7 @@
             function getStaffCapacityBonus(domain) {
                 // Specialists provide bonus for matching domain jobs
                 let bonus = 0;
-                gameState.staff.forEach(s => {
+                gameState.staff.forEach((s) => {
                     if (s.specialty === domain) bonus += 2;
                     if (s.specialty === 'generalist') bonus += 1;
                 });
@@ -2172,7 +2579,7 @@
 
                 // Apply upgrade effects
                 if (upgradeType === 'rackExpansion') {
-                    gameState.rackCount = 9 + (gameState.upgrades.rackExpansion * 3);
+                    gameState.rackCount = 9 + gameState.upgrades.rackExpansion * 3;
                 }
 
                 updateMaxCapacity();
@@ -2187,7 +2594,9 @@
                     return;
                 }
                 gameState.rackSpecializations[rackIndex] = specialization;
-                logEvent(`Rack ${Math.floor(rackIndex/5)+1}-${(rackIndex%5)+1} specialized: ${specialization || 'general'}`);
+                logEvent(
+                    `Rack ${Math.floor(rackIndex / 5) + 1}-${(rackIndex % 5) + 1} specialized: ${specialization || 'general'}`,
+                );
                 updateDisplay();
             }
 
@@ -2198,21 +2607,24 @@
                 const gameYear = getGameYear();
 
                 // Milestone events (one-time, triggered by day)
-                randomEvents.filter(e => e.oneTime && e.triggerDay === gameState.day).forEach(event => {
-                    if (!gameState.storyMilestones[event.id]) {
-                        triggerEvent(event);
-                        gameState.storyMilestones[event.id] = true;
-                    }
-                });
+                randomEvents
+                    .filter((e) => e.oneTime && e.triggerDay === gameState.day)
+                    .forEach((event) => {
+                        if (!gameState.storyMilestones[event.id]) {
+                            triggerEvent(event);
+                            gameState.storyMilestones[event.id] = true;
+                        }
+                    });
 
                 // Random events (Year 3+, ~1 per month)
                 if (gameYear >= CONFIG.PROGRESSIVE_REVEAL.EVENTS_YEAR) {
                     const dayOfMonth = gameState.day % 30;
                     if (dayOfMonth === 15 && Math.random() < 0.4) {
-                        const eligibleEvents = randomEvents.filter(e =>
-                            !e.oneTime &&
-                            (!e.minYear || gameYear >= e.minYear) &&
-                            !gameState.eventsThisYear.includes(e.id)
+                        const eligibleEvents = randomEvents.filter(
+                            (e) =>
+                                !e.oneTime &&
+                                (!e.minYear || gameYear >= e.minYear) &&
+                                !gameState.eventsThisYear.includes(e.id),
                         );
 
                         if (eligibleEvents.length > 0) {
@@ -2254,14 +2666,14 @@
             // CLOUD PRESSURE SYSTEM
             // ============================================
             function checkCloudPressure() {
-                const teams = gameState.aiTeamJoined ?
-                    ['rd', 'sales', 'benchmark', 'ai'] :
-                    ['rd', 'sales', 'benchmark'];
+                const teams = gameState.aiTeamJoined
+                    ? ['rd', 'sales', 'benchmark', 'ai']
+                    : ['rd', 'sales', 'benchmark'];
 
                 let showWarning = false;
                 let warningTeams = [];
 
-                teams.forEach(team => {
+                teams.forEach((team) => {
                     const sat = gameState.satisfaction[team];
 
                     // Level 40 warning
@@ -2297,7 +2709,7 @@
                 if (showWarning) {
                     warningEl.classList.add('visible');
                     document.getElementById('cloudWarningText').textContent =
-                        `${warningTeams.map(t => t.toUpperCase()).join(', ')} eyeing cloud migration...`;
+                        `${warningTeams.map((t) => t.toUpperCase()).join(', ')} eyeing cloud migration...`;
                 } else {
                     warningEl.classList.remove('visible');
                 }
@@ -2319,8 +2731,8 @@
             // STORY SYSTEM
             // ============================================
             function checkStoryMilestones() {
-                const milestone = storyMilestones.find(m =>
-                    m.day === gameState.day && !gameState.storyMilestones[`story_${m.day}`]
+                const milestone = storyMilestones.find(
+                    (m) => m.day === gameState.day && !gameState.storyMilestones[`story_${m.day}`],
                 );
 
                 if (milestone) {
@@ -2364,7 +2776,7 @@
             let selectedCampaignYears = 5;
 
             function selectCampaign(years) {
-                document.querySelectorAll('.campaign-option').forEach(opt => {
+                document.querySelectorAll('.campaign-option').forEach((opt) => {
                     opt.classList.remove('selected');
                 });
 
@@ -2434,8 +2846,8 @@
                         aiTeamJoined: gameState.aiTeamJoined,
                         cloudWarningsShown: gameState.cloudWarningsShown,
                         storyMilestones: gameState.storyMilestones,
-                        eventsThisYear: gameState.eventsThisYear
-                    }
+                        eventsThisYear: gameState.eventsThisYear,
+                    },
                 };
                 try {
                     localStorage.setItem(SAVE_KEY, JSON.stringify(saveData));
@@ -2521,7 +2933,7 @@
 
                     // Initialize workers for existing staff
                     initializeWorkers();
-                    gameState.staff.forEach(s => addWorkerForStaff(s));
+                    gameState.staff.forEach((s) => addWorkerForStaff(s));
 
                     // Update progressive reveal
                     updateProgressiveReveal();
@@ -2587,7 +2999,7 @@
                 team = team || 'rd';
 
                 // Filter templates by era (can use templates from current or earlier eras)
-                const availableTemplates = requestTemplates[team].filter(t => !t.era || t.era <= era);
+                const availableTemplates = requestTemplates[team].filter((t) => !t.era || t.era <= era);
                 const template = randomChoice(availableTemplates);
 
                 // AI team gets tighter deadlines and more chaotic behavior
@@ -2609,7 +3021,7 @@
                     daysWaiting: 0,
                     isUrgent: isUrgent,
                     provisioning: 0,
-                    chaotic: chaotic
+                    chaotic: chaotic,
                 };
             }
 
@@ -2664,7 +3076,7 @@
                 if (sameRow) {
                     // Check for rack specialization bonus
                     let bonus = 0;
-                    rackIndices.forEach(idx => {
+                    rackIndices.forEach((idx) => {
                         const spec = gameState.rackSpecializations[idx];
                         if (spec && request.domain) {
                             if (spec === 'gpu' && request.domain === 'compute') bonus += 1;
@@ -2727,7 +3139,7 @@
                 // Apply any penalty for suboptimal placement
                 if (placement.penalty) {
                     logEvent(
-                        `${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`
+                        `${request.name} placed - ${placement.reason} (${placement.penalty} ${request.team.toUpperCase()})`,
                     );
                     adjustSatisfaction(request.team, placement.penalty);
                 } else {
@@ -2763,16 +3175,18 @@
                 if (getGameYear() >= 3) {
                     const failureChance = [0.02, 0.01, 0.005][gameState.upgrades.hardwareGen - 1] || 0.02;
                     if (Math.random() < failureChance) {
-                        const occupiedRacks = gameState.racks.map((r, i) =>
-                            r && r.status !== 'deprovisioning' ? i : -1
-                        ).filter(i => i >= 0);
+                        const occupiedRacks = gameState.racks
+                            .map((r, i) => (r && r.status !== 'deprovisioning' ? i : -1))
+                            .filter((i) => i >= 0);
                         if (occupiedRacks.length > 0 && Math.random() < 0.3) {
                             // Hardware failure event
                             const rackIdx = randomChoice(occupiedRacks);
                             const job = gameState.racks[rackIdx];
                             if (job && job.team) {
                                 adjustSatisfaction(job.team, -5);
-                                logEvent(`Minor hardware issue in rack ${Math.floor(rackIdx/5)+1}-${(rackIdx%5)+1}`);
+                                logEvent(
+                                    `Minor hardware issue in rack ${Math.floor(rackIdx / 5) + 1}-${(rackIdx % 5) + 1}`,
+                                );
                             }
                         }
                     }
@@ -2780,7 +3194,10 @@
 
                 // Process deprovisioning first (uses sysadmin capacity)
                 const deproToProcess = [];
-                const capacityForDepro = Math.min(gameState.deproQueue.length, gameState.maxCapacity - gameState.capacityUsedToday);
+                const capacityForDepro = Math.min(
+                    gameState.deproQueue.length,
+                    gameState.maxCapacity - gameState.capacityUsedToday,
+                );
 
                 for (let i = 0; i < capacityForDepro; i++) {
                     const depro = gameState.deproQueue.shift();
@@ -2798,7 +3215,7 @@
                 if (deproToProcess.length > 0) {
                     const rackCount = deproToProcess.length;
                     logEvent(
-                        `Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`
+                        `Deprovisioned ${rackCount} rack${rackCount > 1 ? 's' : ''} (${gameState.capacityUsedToday}/${gameState.maxCapacity} capacity used)`,
                     );
                 }
 
@@ -2843,7 +3260,7 @@
                         const bonus = job.team === 'ai' ? 7 : 5;
                         adjustSatisfaction(job.team, bonus);
                         logEvent(
-                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+${bonus} ${job.team.toUpperCase()})`
+                            `${job.name} completed - deprovisioning ${job.rackIndices.length} racks (+${bonus} ${job.team.toUpperCase()})`,
                         );
                         playSound('success');
                     }
@@ -2928,7 +3345,7 @@
             const workerState = {
                 workers: [],
                 nextWorkerId: 1,
-                initialized: false
+                initialized: false,
             };
 
             function initializeWorkers() {
@@ -2948,7 +3365,7 @@
                     y: 50 + workerState.workers.length * 35,
                     carrying: null,
                     busy: false,
-                    element: null
+                    element: null,
                 };
 
                 const el = document.createElement('div');
@@ -2981,7 +3398,7 @@
             }
 
             function removeWorkerForStaff(staffId) {
-                const idx = workerState.workers.findIndex(w => w.staffId === staffId);
+                const idx = workerState.workers.findIndex((w) => w.staffId === staffId);
                 if (idx >= 0) {
                     const worker = workerState.workers[idx];
                     if (worker.element) {
@@ -2994,7 +3411,7 @@
 
             function getAvailableWorker() {
                 // Find a non-busy worker
-                return workerState.workers.find(w => !w.busy) || null;
+                return workerState.workers.find((w) => !w.busy) || null;
             }
 
             function updateStaffBreakdown() {
@@ -3003,7 +3420,7 @@
 
                 // Count by specialty
                 const counts = { generalist: 2 }; // 2 base workers
-                gameState.staff.forEach(s => {
+                gameState.staff.forEach((s) => {
                     counts[s.specialty] = (counts[s.specialty] || 0) + 1;
                 });
 
@@ -3011,14 +3428,14 @@
                     generalist: 'var(--staff-generalist)',
                     network: 'var(--staff-network)',
                     storage: 'var(--staff-storage)',
-                    compute: 'var(--staff-compute)'
+                    compute: 'var(--staff-compute)',
                 };
 
                 const labels = {
                     generalist: 'Base',
                     network: 'Net',
                     storage: 'Stor',
-                    compute: 'Comp'
+                    compute: 'Comp',
                 };
 
                 let html = '';
@@ -3034,14 +3451,14 @@
             function getRackPosition(rackIndex) {
                 const floor = document.getElementById('rackFloor');
                 const racks = floor.querySelectorAll('.rack[data-index]');
-                const rack = Array.from(racks).find(r => r.dataset.index == rackIndex);
+                const rack = Array.from(racks).find((r) => r.dataset.index == rackIndex);
 
                 if (rack) {
                     const floorRect = floor.getBoundingClientRect();
                     const rackRect = rack.getBoundingClientRect();
                     return {
                         x: rackRect.left - floorRect.left + rackRect.width / 2 - 10,
-                        y: rackRect.top - floorRect.top + rackRect.height / 2 - 14
+                        y: rackRect.top - floorRect.top + rackRect.height / 2 - 14,
                     };
                 }
                 return { x: 100, y: 100 };
@@ -3099,10 +3516,10 @@
 
             function queueEquipmentInstall(rackIndices, domain) {
                 const equipmentTypes = {
-                    'compute': 'server',
-                    'storage': 'storage-device',
-                    'network': 'network-switch',
-                    'gpu': 'gpu'
+                    compute: 'server',
+                    storage: 'storage-device',
+                    network: 'network-switch',
+                    gpu: 'gpu',
                 };
                 const equipType = equipmentTypes[domain] || 'server';
 
@@ -3188,8 +3605,8 @@
                         // Show specialization
                         const spec = gameState.rackSpecializations[idx];
                         if (spec) {
-                            rack.style.borderBottomColor = spec === 'gpu' ? '#e74c3c' :
-                                spec === 'storage' ? '#9b59b6' : '#3498db';
+                            rack.style.borderBottomColor =
+                                spec === 'gpu' ? '#e74c3c' : spec === 'storage' ? '#9b59b6' : '#3498db';
                             rack.style.borderBottomWidth = '3px';
                         }
 
@@ -3255,11 +3672,15 @@
             }
 
             function getSlotClass(domain) {
-                switch(domain) {
-                    case 'storage': return 'storage-slot';
-                    case 'network': return 'network-slot';
-                    case 'gpu': return 'gpu-slot';
-                    default: return '';
+                switch (domain) {
+                    case 'storage':
+                        return 'storage-slot';
+                    case 'network':
+                        return 'network-slot';
+                    case 'gpu':
+                        return 'gpu-slot';
+                    default:
+                        return '';
                 }
             }
 
@@ -3285,7 +3706,9 @@
                                 sameRowNote = '<br><span class="request-adjacency">Same row preferred</span>';
                             }
                         }
-                        const chaoticNote = req.chaotic ? '<br><span style="color:#ca8a2a;font-size:9px;">⚠ Specs may change</span>' : '';
+                        const chaoticNote = req.chaotic
+                            ? '<br><span style="color:#ca8a2a;font-size:9px;">⚠ Specs may change</span>'
+                            : '';
                         return `
                 <div class="request-card ${req.isUrgent ? 'urgent' : ''} ${gameState.selectedRequest?.id === req.id ? 'selected' : ''}"
                      data-id="${req.id}">
@@ -3315,9 +3738,9 @@
             }
 
             function updateSatisfactionDisplay() {
-                const teams = gameState.aiTeamJoined ?
-                    ['rd', 'sales', 'benchmark', 'ai'] :
-                    ['rd', 'sales', 'benchmark'];
+                const teams = gameState.aiTeamJoined
+                    ? ['rd', 'sales', 'benchmark', 'ai']
+                    : ['rd', 'sales', 'benchmark'];
 
                 teams.forEach((team) => {
                     const value = gameState.satisfaction[team];
@@ -3341,7 +3764,9 @@
                     return;
                 }
 
-                roster.innerHTML = gameState.staff.map(s => `
+                roster.innerHTML = gameState.staff
+                    .map(
+                        (s) => `
                     <div class="staff-figure ${s.specialty}" data-id="${s.id}" onclick="fireStaff(${s.id})" title="Click to dismiss ${s.specialty} specialist">
                         <div class="head"></div>
                         <div class="body"></div>
@@ -3351,7 +3776,9 @@
                         </div>
                         <div class="specialty-badge">${s.specialty.charAt(0).toUpperCase()}</div>
                     </div>
-                `).join('');
+                `,
+                    )
+                    .join('');
             }
 
             function renderUpgrades() {
@@ -3379,7 +3806,7 @@
                     } else {
                         html += `
                             <div class="upgrade-card purchased">
-                                <div>${upgrades[upgrades.length-1].name}</div>
+                                <div>${upgrades[upgrades.length - 1].name}</div>
                                 <div style="font-size:9px;opacity:0.8;">Purchased</div>
                             </div>
                         `;
@@ -3402,8 +3829,8 @@
 
                 const ratio = Math.max(0, gameState.budget.current / gameState.budget.yearly);
                 fill.style.width = `${Math.min(100, ratio * 100)}%`;
-                fill.style.background = ratio > 0.5 ? 'var(--budget-green)' :
-                    ratio > 0.2 ? 'var(--budget-yellow)' : 'var(--budget-red)';
+                fill.style.background =
+                    ratio > 0.5 ? 'var(--budget-green)' : ratio > 0.2 ? 'var(--budget-yellow)' : 'var(--budget-red)';
 
                 monthly.textContent = `$${calculateMonthlyExpenses().toLocaleString()}`;
                 yearEl.textContent = getCalendarYear();
@@ -3525,9 +3952,9 @@
             // GAME OVER / VICTORY
             // ============================================
             function checkGameOver() {
-                const teams = gameState.aiTeamJoined ?
-                    ['rd', 'sales', 'benchmark', 'ai'] :
-                    ['rd', 'sales', 'benchmark'];
+                const teams = gameState.aiTeamJoined
+                    ? ['rd', 'sales', 'benchmark', 'ai']
+                    : ['rd', 'sales', 'benchmark'];
 
                 for (const team of teams) {
                     if (gameState.satisfaction[team] < 20) {
