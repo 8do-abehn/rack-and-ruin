@@ -1653,6 +1653,7 @@
                             min="1"
                             max="15"
                             value="5"
+                            onkeydown="if(event.key==='Enter')startGame()"
                             style="
                                 width: 60px;
                                 padding: 5px;
@@ -1662,8 +1663,8 @@
                             "
                         />
                         <span> years</span>
+                        <button class="btn primary" onclick="startGame()" style="margin-left: 10px">Go</button>
                     </div>
-                    <button class="btn primary" onclick="startGame()">Begin</button>
                 </div>
             </div>
         </div>
@@ -2788,6 +2789,8 @@
                     document.querySelector(`[data-years="${years}"]`).classList.add('selected');
                     document.getElementById('customYearsInput').style.display = 'none';
                     selectedCampaignYears = years;
+                    // Start immediately for preset options
+                    startGame();
                 }
             }
 
