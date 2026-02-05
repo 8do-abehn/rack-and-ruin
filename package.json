@@ -6,6 +6,7 @@
     "lint": "npm run lint:html && npm run lint:js",
     "lint:html": "htmlhint index.html",
     "lint:js": "eslint --ext .html .",
+    "lint:actions": "actionlint .github/workflows/*.yml",
     "lint:fix": "eslint --ext .html . --fix",
     "format": "prettier --write index.html",
     "format:check": "prettier --check index.html"

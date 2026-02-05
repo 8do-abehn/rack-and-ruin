@@ -27,9 +27,9 @@ jobs:
           echo "Current version: $CURRENT"
 
           # Parse version components
-          MAJOR=$(echo $CURRENT | cut -d. -f1 | tr -d 'v')
-          MINOR=$(echo $CURRENT | cut -d. -f2)
-          PATCH=$(echo $CURRENT | cut -d. -f3)
+          MAJOR=$(echo "$CURRENT" | cut -d. -f1 | tr -d 'v')
+          MINOR=$(echo "$CURRENT" | cut -d. -f2)
+          PATCH=$(echo "$CURRENT" | cut -d. -f3)
 
           # Bump patch version
           NEW_PATCH=$((PATCH + 1))
@@ -40,7 +40,7 @@ jobs:
           sed -i "s/$CURRENT/$NEW_VERSION/g" index.html
 
           # Set output for next steps
-          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "NEW_VERSION=$NEW_VERSION" >> "$GITHUB_ENV"
 
       - name: Create Pull Request
         env:
