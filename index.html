@@ -192,6 +192,25 @@
                 );
             }
 
+            .rack.unowned {
+                opacity: 0.4;
+                border-style: dashed;
+                border-color: var(--accent-amber);
+                cursor: pointer;
+            }
+
+            .rack.unowned:hover {
+                opacity: 0.7;
+                border-color: var(--accent-blue);
+                box-shadow: 0 0 10px rgba(74, 158, 255, 0.3);
+            }
+
+            .rack.unowned .buy-prompt {
+                font-size: clamp(8px, 0.9vw, 11px);
+                color: var(--accent-amber);
+                text-align: center;
+            }
+
             @keyframes pulse {
                 0%,
                 100% {
@@ -3916,7 +3935,7 @@
                 floor.innerHTML = '';
 
                 const cols = getRackColumns();
-                const rows = Math.ceil(gameState.rackCount / cols);
+                const rows = Math.ceil(gameState.maxRackSlots / cols);
 
                 // Update grid columns
                 floor.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
@@ -3930,14 +3949,24 @@
                     for (let col = 0; col < cols; col++) {
                         const idx = row * cols + col;
 
-                        // Skip racks beyond current capacity
-                        if (idx >= gameState.rackCount) {
-                            const placeholder = document.createElement('div');
-                            placeholder.className = 'rack';
-                            placeholder.style.opacity = '0.2';
-                            placeholder.style.cursor = 'not-allowed';
-                            placeholder.innerHTML = '<div class="rack-label" style="opacity:0.3">--</div>';
-                            floor.appendChild(placeholder);
+                        // Skip slots beyond max capacity
+                        if (idx >= gameState.maxRackSlots) {
+                            continue;
+                        }
+
+                        // Unowned slot - purchasable
+                        if (idx >= gameState.ownedRacks) {
+                            const slot = document.createElement('div');
+                            slot.className = 'rack unowned';
+                            slot.dataset.index = idx;
+                            slot.innerHTML = `
+                                <div class="buy-prompt">
+                                    <div>+</div>
+                                    <div>$${CONFIG.RACK_COST.toLocaleString()}</div>
+                                </div>
+                            `;
+                            slot.onclick = buyRack;
+                            floor.appendChild(slot);
                             continue;
                         }
 
