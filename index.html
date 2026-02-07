@@ -3965,7 +3965,12 @@
                                     <div>$${CONFIG.RACK_COST.toLocaleString()}</div>
                                 </div>
                             `;
-                            slot.onclick = buyRack;
+                            slot.onclick = () => {
+                                if (gameState.selectedRequest) {
+                                    logEvent('Purchase this rack first to use it');
+                                }
+                                buyRack();
+                            };
                             floor.appendChild(slot);
                             continue;
                         }
@@ -4492,8 +4497,8 @@
 
             function handleRackClick(index) {
                 if (!gameState.selectedRequest) return;
-                // Can't place on occupied, deprovisioning, or unavailable racks
-                if (index >= gameState.rackCount) return;
+                // Can't place on unowned or occupied racks
+                if (index >= gameState.ownedRacks) return;
                 if (gameState.racks[index] !== null) return;
 
                 const idx = gameState.selectedRacks.indexOf(index);
